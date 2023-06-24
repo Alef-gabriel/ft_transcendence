@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const PongGame: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -6,6 +6,8 @@ const PongGame: React.FC = () => {
   const paddle1Ref = useRef<HTMLDivElement>(null);
   const paddle2Ref = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
+  const [score1, setScore1] = useState(0);
+  const [score2, setScore2] = useState(0);
   let x = 150;
   let y = 150;
   let dx = 2;
@@ -51,10 +53,8 @@ const PongGame: React.FC = () => {
         if (y > paddle2Y && y < paddle2Y + 60) {
           dx = -dx;
         } else {
-          x = 150;
-          y = 150;
-          dx = 2;
-          dy = 4;
+          setScore1(prevScore => prevScore + 1);
+          resetBall();
         }
       }
 
@@ -62,13 +62,18 @@ const PongGame: React.FC = () => {
         if (y > paddle1Y && y < paddle1Y + 60) {
           dx = -dx;
         } else {
-          x = 150;
-          y = 150;
-          dx = 2;
-          dy = 4;
+          setScore2(prevScore => prevScore + 1);
+          resetBall();
         }
       }
     }
+  };
+
+  const resetBall = () => {
+    x = 150;
+    y = 150;
+    dx = 2;
+    dy = 4;
   };
 
   const handleMouseMove = (event: React.MouseEvent) => {
@@ -83,10 +88,16 @@ const PongGame: React.FC = () => {
   };
 
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 10, left: 10 }}>
+        Player 1 Score: {score1}
+      </div>
+      <div style={{ position: 'absolute', top: 10, right: 10 }}>
+        Player 2 Score: {score2}
+      </div>
       <canvas
         ref={canvasRef}
-        style={{ border: '1px solid #FFF' }}
+        style={{ border: '1px solid #FFF', marginTop: 30 }}
         onMouseMove={handleMouseMove}
       />
       <div
@@ -107,19 +118,8 @@ const PongGame: React.FC = () => {
           width: '10px',
           height: '60px',
           backgroundColor: '#FFF',
-          left: '780px',
-          top: '40px',
-        }}
-      />
-      <div
-        ref={ballRef}
-        style={{
-          position: 'absolute',
-          width: '10px',
-          height: '10px',
-          backgroundColor: '#FFF',
-          left: `${x}px`,
-          top: `${y}px`,
+          right: '10px',
+          top: `${paddle2Y}px`,
         }}
       />
     </div>
