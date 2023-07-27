@@ -1,108 +1,141 @@
-import {Injectable, Logger} from "@nestjs/common";
-import {UserEntity} from "../typeorm";
-import {ConfigService} from "@nestjs/config";
-import {authenticator} from "otplib";
-import {Response} from 'express';
-import {UserService} from "../user/user.service";
-import {toFileStream} from "qrcode";
-import {SessionUser} from "./index";
+import { Injectable, Logger } from '@nestjs/common';
+import { UserEntity } from '../typeorm';
+import { ConfigService } from '@nestjs/config';
+import { authenticator } from 'otplib';
+import { Response } from 'express';
+import { UserService } from '../user/user.service';
+import { toFileStream } from 'qrcode';
+import { SessionUser } from './index';
 
 //TODO: Criar Módulo User, refatorar o código, criar UserService e UserRepository
 //TODO: Ao invés de salvar o OTP secret no cookie, procurar no banco de dados
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
 
-    private readonly logger = new Logger(AuthService.name);
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) {}
 
-    constructor(private readonly userService: UserService,
-                private readonly configService: ConfigService) {
+  async validateUser(sessionUser: SessionUser) {
+    this.logger.debug(`### OAuth2 user: ${JSON.stringify(sessionUser)}`);
+
+    const userEntity: UserEntity = this.convertSessionToEntity(sessionUser);
+    const databaseUser: UserEntity | null = await this.userService.findByEmail(
+      sessionUser.email,
+    );
+
+    this.logger.debug(
+      `### Current Database User: ${JSON.stringify(databaseUser)}`,
+    );
+    if (databaseUser) {
+      await this.userService.update(userEntity);
+      return this.convertEntityToSession(databaseUser);
     }
 
-    async validateUser(sessionUser: SessionUser) {
-        this.logger.debug(`### OAuth2 user: ${JSON.stringify(sessionUser)}`);
+    this.logger.debug(
+      `### User ${sessionUser.id} not found. Creating new user`,
+    );
+    const newUser: UserEntity = await this.userService.create(userEntity);
+    return this.convertEntityToSession(await this.userService.save(newUser));
+  }
 
-        const userEntity: UserEntity = this.convertSessionToEntity(sessionUser);
-        const databaseUser: UserEntity | null = await this.userService.findByEmail(sessionUser.email);
+  async enable2FA(id: number): Promise<void> {
+    await this.userService.enable2FA(id);
+  }
 
-        this.logger.debug(`### Current Database User: ${JSON.stringify(databaseUser)}`);
-        if (databaseUser) {
-            await this.userService.update(userEntity);
-            return this.convertEntityToSession(databaseUser);
-        }
+  async disable2FA(id: number): Promise<void> {
+    await this.userService.disable2FA(id);
+  }
 
-        this.logger.debug(`### User ${sessionUser.id} not found. Creating new user`)
-        const newUser: UserEntity = await this.userService.create(userEntity);
-        return this.convertEntityToSession(await this.userService.save(newUser));
-    }
+  async validateOTP(id: number): Promise<void> {
+    await this.userService.validateOTP(id);
+  }
 
-    async enable2FA(id: number): Promise<void> {
-        await this.userService.enable2FA(id);
-    }
+  async invalidateOTP(id: number): Promise<void> {
+    await this.userService.invalidateOTP(id);
+  }
 
-    async disable2FA(id: number): Promise<void> {
-        await this.userService.disable2FA(id);
-    }
+  public async add2FASecret(id: number, secret: string): Promise<void> {
+    await this.userService.add2FASecret(id, secret);
+  }
 
-    async validateOTP(id: number): Promise<void> {
-        await this.userService.validateOTP(id);
-    }
+  public is2FACodeValid(code: string, secret: string): boolean {
+    return authenticator.verify({
+      token: code,
+      secret: secret,
+    });
+  }
 
-    async invalidateOTP(id: number): Promise<void> {
-        await this.userService.invalidateOTP(id);
-    }
+  public async generate2FASecret(id: number, email: string): Promise<string> {
+    const secret = authenticator.generateSecret();
+    const otpAuthUrl = authenticator.keyuri(
+      email,
+      String(
+        this.configService.get<string>('APP_TWO_FACTOR_AUTHENTICATION_NAME'),
+      ),
+      secret,
+    );
 
-    public async add2FASecret(id: number, secret: string): Promise<void> {
-        await this.userService.add2FASecret(id, secret);
-    }
+    await this.add2FASecret(id, secret);
 
-    public is2FACodeValid(code: string, secret: string): boolean {
-        return authenticator.verify({
-            token: code,
-            secret: secret
-        })
-    }
+    return otpAuthUrl;
+  }
 
-    public async generate2FASecret(id: number, email: string): Promise<string> {
-        const secret = authenticator.generateSecret();
-        const otpAuthUrl = authenticator.keyuri(email, String(this.configService.get<string>('APP_TWO_FACTOR_AUTHENTICATION_NAME')), secret);
+  public async pipeQrCodeStream(
+    stream: Response,
+    otpauthUrl: string,
+  ): Promise<void> {
+    //toDataURL()
+    return toFileStream(stream, otpauthUrl);
+  }
 
-        await this.add2FASecret(id, secret);
+  private convertSessionToEntity(sessionUser: SessionUser): UserEntity {
+    const {
+      id,
+      username,
+      displayName,
+      email,
+      profileUrl,
+      otpEnabled,
+      otpSecret,
+      otpValidated,
+    } = sessionUser;
+    const userEntity: UserEntity = new UserEntity();
 
-        return otpAuthUrl;
-    }
+    userEntity.id = id;
+    userEntity.username = username;
+    userEntity.displayName = displayName;
+    userEntity.email = email;
+    userEntity.profileUrl = profileUrl;
+    userEntity.otpEnabled = otpEnabled;
+    userEntity.otpSecret = otpSecret;
+    userEntity.otpValidated = otpValidated;
 
-    public async pipeQrCodeStream(stream: Response, otpauthUrl: string): Promise<void> {
-        //toDataURL()
-        return toFileStream(stream, otpauthUrl);
-    }
+    return userEntity;
+  }
 
-    private convertSessionToEntity(sessionUser: SessionUser): UserEntity {
-        const {id, username, displayName, email, profileUrl, otpEnabled, otpSecret, otpValidated} = sessionUser;
-        const userEntity: UserEntity = new UserEntity();
-
-        userEntity.id = id;
-        userEntity.username = username;
-        userEntity.displayName = displayName;
-        userEntity.email = email;
-        userEntity.profileUrl = profileUrl;
-        userEntity.otpEnabled = otpEnabled;
-        userEntity.otpSecret = otpSecret;
-        userEntity.otpValidated = otpValidated;
-
-        return userEntity;
-    }
-
-    private convertEntityToSession(userEntity: UserEntity): SessionUser {
-        const {id, username, displayName, email, profileUrl, otpEnabled, otpSecret, otpValidated} = userEntity;
-        return {
-            id,
-            username,
-            displayName,
-            email,
-            profileUrl,
-            otpEnabled,
-            otpSecret,
-            otpValidated
-        };
-    }
+  private convertEntityToSession(userEntity: UserEntity): SessionUser {
+    const {
+      id,
+      username,
+      displayName,
+      email,
+      profileUrl,
+      otpEnabled,
+      otpSecret,
+      otpValidated,
+    } = userEntity;
+    return {
+      id,
+      username,
+      displayName,
+      email,
+      profileUrl,
+      otpEnabled,
+      otpSecret,
+      otpValidated,
+    };
+  }
 }

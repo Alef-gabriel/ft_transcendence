@@ -1,3 +1,3 @@
 export interface OTP {
-    code: string;
+  code: string;
 }
