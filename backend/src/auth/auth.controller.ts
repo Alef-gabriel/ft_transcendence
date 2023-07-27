@@ -27,7 +27,9 @@ export class AuthController {
   @Public()
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/login')
-  async login(): Promise<void> {}
+  async login(@Res() res: any): Promise<void> {
+    return res.status(200);
+  }
 
   @Public()
   @UseGuards(FortyTwoAuthGuard)
