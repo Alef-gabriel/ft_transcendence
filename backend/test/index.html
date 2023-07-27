@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login with OAuth2 & Two-Factor Authentication</title>
+</head>
+<body>
+<div>
+    <h1>Login with OAuth2 and 2FA</h1>
+    <!-- Your OAuth2 login button/link here -->
+    <a href="http://localhost:3000/api/auth/42/login">Login with OAuth2</a>
+</div>
+<br>
+<div>
+    <form id="2fa-form" action="http://localhost:3000/api/auth/2fa/validate" method="post">
+        <label for="2fa-code">Enter 2FA Code:</label>
+        <input type="text" id="2fa-code" name="code" placeholder="Enter your 2FA code here">
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+</body>
+</html>
