@@ -28,38 +28,27 @@ export class UserAuthenticatedGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     this.logger.verbose(`### Checking if user is authenticated`);
 
-    //Check if the route is public
+    //Allow if the route is public
     if (isPublic) {
       return true;
     }
 
-    //Check if user not is authenticated.
-    //Under the covers, this method checks if user property exists on request object
+    //Block if user not is authenticated.
     if (!request.isAuthenticated()) {
       return false;
     }
 
-    //User is authenticated, but 2FA is not enabled
+    //Allow if user is authenticated and 2FA is not enabled
     if (!request.user.otpEnabled) {
       return true;
     }
 
-    //User has 2FA enabled, check if the route is for 2FA validation and if the user is not validated yet
-    if (
-      isTwoFactorAuth &&
-      request.user.otpEnabled &&
-      !request.user.otpValidated
-    ) {
+    //Allow if user is authenticated and 2FA is validated
+    if (request.user.otpValidated) {
       return true;
     }
 
-    //Check if user is not 2FA validated for non-2FA routes
-    if (!request.user.otpValidated) {
-      this.logger.debug('### User has 2FA enabled, but is not validated yet');
-      return false;
-    }
-
-    //User is authenticated and 2FA validated
-    return true;
+    //Grant access only to 2FA authentication routes, if user enabled 2FA but is not validated yet
+    return isTwoFactorAuth;
   }
 }

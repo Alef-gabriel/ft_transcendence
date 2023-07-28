@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -83,6 +84,10 @@ export class AuthController {
     @Res() res: any,
     @Body() otp: OTP,
   ) {
+    if (user.otpEnabled) {
+      throw new BadRequestException('OTP already enabled');
+    }
+
     if (!this.authService.is2FACodeValid(otp.code, user.otpSecret!)) {
       throw new UnauthorizedException('Wrong authentication code');
     }
@@ -92,6 +97,10 @@ export class AuthController {
 
   @Post('2fa/turn-off')
   async turnOff2FA(@Req() { user }: { user: SessionUser }, @Res() res: any) {
+    if (!user.otpEnabled) {
+      throw new BadRequestException('OTP already disabled');
+    }
+
     await this.authService.disable2FA(user.id);
     return res.status(201).json({ msg: 'Two-factor authentication disabled' });
   }
@@ -100,6 +109,10 @@ export class AuthController {
   @Post('2fa/validate')
   async validate2FA(@Req() req: Request, @Res() res: any, @Body() otp: OTP) {
     const user: SessionUser = req.user as SessionUser;
+
+    if (user.otpValidated) {
+      throw new BadRequestException('OTP already validated');
+    }
 
     if (!this.authService.is2FACodeValid(otp.code, user.otpSecret!)) {
       throw new UnauthorizedException('Wrong authentication code');
