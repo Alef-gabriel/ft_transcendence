@@ -1,5 +1,5 @@
-import { UserEntity } from './entities/user.entity';
-import { SessionEntity } from './entities/session.entity';
+import { UserEntity } from './user.entity';
+import { SessionEntity } from './session.entity';
 
 const entities = [UserEntity, SessionEntity];
 

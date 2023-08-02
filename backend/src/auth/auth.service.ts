@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UserEntity } from '../typeorm';
+import { UserEntity } from '../db/entities';
 import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
 import { Response } from 'express';

@@ -8,7 +8,7 @@ import {
   SessionSerializer,
   UserAuthenticatedGuard,
 } from './index';
-import entities from '../typeorm';
+import entities from '../db/entities';
 import { UserService } from '../user/user.service';
 
 @Module({
@@ -21,9 +21,7 @@ import { UserService } from '../user/user.service';
     SessionSerializer,
     AuthService,
   ],
-  imports: [
-    TypeOrmModule.forFeature(entities), //Remover depois
-  ],
+  imports: [TypeOrmModule.forFeature(entities)],
   exports: [UserAuthenticatedGuard],
 })
 export class AuthModule {}

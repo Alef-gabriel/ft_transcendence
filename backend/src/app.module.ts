@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
-import entities from './typeorm';
+import entities from './db/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserAuthenticatedGuard } from './auth';
 import { UserModule } from './user/user.module';
@@ -25,6 +25,7 @@ import { UserModule } from './user/user.module';
         database: configService.get<string>('DB_NAME') || 'transcendence',
         entities: entities,
         synchronize: true,
+        autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),

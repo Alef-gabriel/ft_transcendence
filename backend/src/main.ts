@@ -4,7 +4,7 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import { TypeormStore } from 'connect-typeorm';
 import { DataSource } from 'typeorm';
-import { SessionEntity } from './typeorm';
+import { SessionEntity } from './db/entities';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
