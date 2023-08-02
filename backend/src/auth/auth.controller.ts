@@ -69,7 +69,7 @@ export class AuthController {
     return res.status(200).json({ msg: '@Public route' });
   }
 
-  @Post('2fa/register')
+  @Get('2fa/register')
   async register2FA(@Req() { user }: { user: SessionUser }, @Res() res: any) {
     const otpAuthUrl: string = await this.authService.generate2FASecret(
       user.id,
