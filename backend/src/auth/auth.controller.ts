@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   InternalServerErrorException,
   Post,
   Req,
@@ -19,7 +21,7 @@ import {
   TwoFactorAuthentication,
 } from './index';
 import { AuthService } from './auth.service';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -28,44 +30,35 @@ export class AuthController {
   @Public()
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/login')
-  async login(@Res() res: any): Promise<void> {
-    return res.status(200);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async login() {
+    return;
   }
 
   @Public()
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/redirect')
-  async redirect(@Res() res: any): Promise<void> {
-    return res.status(200).json({
-      message: 'OK',
-    });
+  @HttpCode(HttpStatus.OK)
+  async redirect() {
+    return { message: 'OK' };
   }
 
   @Get('logout')
+  @HttpCode(HttpStatus.OK)
   async logout(
     @Req() { user }: { user: SessionUser },
-    @Res() res: any,
     @Session() session: any,
-  ): Promise<void> {
+  ) {
     await this.authService.logoutUser(user, session);
-    return res.status(200).json({ message: 'Logout successful' });
-  }
-
-  // Debug route to check if user is authenticated
-  @Get('status')
-  async status(@Res() res: any) {
-    return res.status(200).json({ msg: 'Authenticated' });
-  }
-
-  // Debug route to check if it's public
-  @Public()
-  @Get('public')
-  async public(@Res() res: any) {
-    return res.status(200).json({ msg: '@Public route' });
+    return { message: 'Logout successful' };
   }
 
   @Get('2fa/register')
-  async register2FA(@Req() { user }: { user: SessionUser }, @Res() res: any) {
+  @HttpCode(HttpStatus.OK)
+  async register2FA(
+    @Req() { user }: { user: SessionUser },
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const otpAuthUrl: string = await this.authService.generate2FASecret(
       user.id,
       user.email,
@@ -74,36 +67,43 @@ export class AuthController {
   }
 
   @Post('2fa/turn-on')
-  async turnOn2FA(
-    @Req() { user }: { user: SessionUser },
-    @Res() res: any,
-    @Body() otp: OTP,
-  ) {
+  @HttpCode(HttpStatus.CREATED)
+  async turnOn2FA(@Req() { user }: { user: SessionUser }, @Body() otp: OTP) {
     await this.authService.enable2FA(user, otp);
-    return res.status(201).json({ msg: 'Two-factor authentication enabled' });
+    return { msg: 'Two-factor authentication enabled' };
   }
 
   @Post('2fa/turn-off')
-  async turnOff2FA(@Req() { user }: { user: SessionUser }, @Res() res: any) {
+  @HttpCode(HttpStatus.CREATED)
+  async turnOff2FA(@Req() { user }: { user: SessionUser }) {
     await this.authService.disable2FA(user);
-    return res.status(201).json({ msg: 'Two-factor authentication disabled' });
+    return { msg: 'Two-factor authentication disabled' };
   }
 
   @TwoFactorAuthentication()
   @Post('2fa/validate')
-  async validate2FA(@Req() req: Request, @Res() res: any, @Body() otp: OTP) {
-    const user: SessionUser = req.user as SessionUser;
+  async validate2FA(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() otp: OTP,
+  ) {
+    await this.authService.validateOTP(req.user as SessionUser, otp);
+    await this.authService.login2FAUser(req, res);
+    //return { msg: 'Two-factor authentication validated' };
+  }
 
-    await this.authService.validateOTP(user, otp);
+  // Debug route to check if user is authenticated
+  @Get('status')
+  @HttpCode(HttpStatus.OK)
+  async status() {
+    return { msg: 'Authenticated' };
+  }
 
-    req.logIn({ ...req.user, otpValidated: true }, function (err: any) {
-      if (err) {
-        throw new InternalServerErrorException('Error on logIn');
-      }
-
-      return res
-        .status(200)
-        .json({ msg: 'Two-factor authentication validated' });
-    });
+  // Debug route to check if it's public
+  @Public()
+  @Get('public')
+  @HttpCode(HttpStatus.OK)
+  async public() {
+    return { msg: '@Public route' };
   }
 }

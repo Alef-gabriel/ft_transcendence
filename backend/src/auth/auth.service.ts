@@ -1,13 +1,14 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserEntity } from '../db/entities';
 import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { toFileStream } from 'qrcode';
 import { OTP, SessionUser } from './index';
@@ -42,6 +43,19 @@ export class AuthService {
     this.logger.debug(`### User ${user.id} not found. Creating new user`);
     const newUser: UserEntity = await this.userService.create(userEntity);
     return this.convertEntityToSession(await this.userService.save(newUser));
+  }
+
+  async login2FAUser(req: Request, res: Response) {
+    //Create new session for the two factor authenticated user, using express-session
+    req.logIn({ ...req.user, otpValidated: true }, function (err: any) {
+      if (err) {
+        throw new InternalServerErrorException('Error on logIn');
+      }
+
+      return res
+        .status(201)
+        .json({ msg: 'Two-factor authentication validated' });
+    });
   }
 
   async logoutUser(user: SessionUser, session: any): Promise<void> {
