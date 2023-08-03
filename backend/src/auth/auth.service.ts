@@ -1,11 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserEntity } from '../db/entities';
 import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
 import { Response } from 'express';
 import { UserService } from '../user/user.service';
 import { toFileStream } from 'qrcode';
-import { SessionUser } from './index';
+import { OTP, SessionUser } from './index';
 
 //TODO: Criar Módulo User, refatorar o código, criar UserService e UserRepository
 //TODO: Ao invés de salvar o OTP secret no cookie, procurar no banco de dados
@@ -18,12 +23,12 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async validateUser(sessionUser: SessionUser) {
-    this.logger.debug(`### OAuth2 user: ${JSON.stringify(sessionUser)}`);
+  async loginUser(user: SessionUser) {
+    this.logger.debug(`### OAuth2 user: ${JSON.stringify(user)}`);
 
-    const userEntity: UserEntity = this.convertSessionToEntity(sessionUser);
+    const userEntity: UserEntity = this.convertSessionToEntity(user);
     const databaseUser: UserEntity | null = await this.userService.findByEmail(
-      sessionUser.email,
+      user.email,
     );
 
     this.logger.debug(
@@ -34,23 +39,50 @@ export class AuthService {
       return this.convertEntityToSession(databaseUser);
     }
 
-    this.logger.debug(
-      `### User ${sessionUser.id} not found. Creating new user`,
-    );
+    this.logger.debug(`### User ${user.id} not found. Creating new user`);
     const newUser: UserEntity = await this.userService.create(userEntity);
     return this.convertEntityToSession(await this.userService.save(newUser));
   }
 
-  async enable2FA(id: number): Promise<void> {
-    await this.userService.enable2FA(id);
+  async logoutUser(user: SessionUser, session: any): Promise<void> {
+    if (session) {
+      session.destroy();
+    }
+    if (user.otpValidated) {
+      await this.invalidateOTP(user.id);
+    }
   }
 
-  async disable2FA(id: number): Promise<void> {
-    await this.userService.disable2FA(id);
+  async enable2FA(user: SessionUser, otp: OTP): Promise<void> {
+    if (user.otpEnabled) {
+      throw new BadRequestException('OTP already enabled');
+    }
+
+    if (!this.is2FACodeValid(otp.code, user.otpSecret!)) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+
+    await this.userService.enable2FA(user.id);
   }
 
-  async validateOTP(id: number): Promise<void> {
-    await this.userService.validateOTP(id);
+  async disable2FA(user: SessionUser): Promise<void> {
+    if (!user.otpEnabled) {
+      throw new BadRequestException('OTP already disabled');
+    }
+
+    await this.userService.disable2FA(user.id);
+  }
+
+  async validateOTP(user: SessionUser, otp: OTP): Promise<void> {
+    if (user.otpValidated) {
+      throw new BadRequestException('OTP already validated');
+    }
+
+    if (!this.is2FACodeValid(otp.code, user.otpSecret!)) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+
+    await this.userService.validateOTP(user.id);
   }
 
   async invalidateOTP(id: number): Promise<void> {
@@ -91,7 +123,7 @@ export class AuthService {
     return toFileStream(stream, otpauthUrl);
   }
 
-  private convertSessionToEntity(sessionUser: SessionUser): UserEntity {
+  private convertSessionToEntity(user: SessionUser): UserEntity {
     const {
       id,
       username,
@@ -101,7 +133,7 @@ export class AuthService {
       otpEnabled,
       otpSecret,
       otpValidated,
-    } = sessionUser;
+    } = user;
     const userEntity: UserEntity = new UserEntity();
 
     userEntity.id = id;

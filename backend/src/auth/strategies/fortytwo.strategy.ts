@@ -37,7 +37,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
       otpEnabled,
       otpSecret,
     } = profile;
-    const user: SessionUser = await this.authService.validateUser({
+    const user: SessionUser = await this.authService.loginUser({
       id,
       username,
       displayName,

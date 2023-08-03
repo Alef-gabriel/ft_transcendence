@@ -47,12 +47,7 @@ export class AuthController {
     @Res() res: any,
     @Session() session: any,
   ): Promise<void> {
-    if (session) {
-      session.destroy();
-    }
-    if (user.otpValidated) {
-      await this.authService.invalidateOTP(user.id);
-    }
+    await this.authService.logoutUser(user, session);
     return res.status(200).json({ message: 'Logout successful' });
   }
 
@@ -84,24 +79,13 @@ export class AuthController {
     @Res() res: any,
     @Body() otp: OTP,
   ) {
-    if (user.otpEnabled) {
-      throw new BadRequestException('OTP already enabled');
-    }
-
-    if (!this.authService.is2FACodeValid(otp.code, user.otpSecret!)) {
-      throw new UnauthorizedException('Wrong authentication code');
-    }
-    await this.authService.enable2FA(user.id);
+    await this.authService.enable2FA(user, otp);
     return res.status(201).json({ msg: 'Two-factor authentication enabled' });
   }
 
   @Post('2fa/turn-off')
   async turnOff2FA(@Req() { user }: { user: SessionUser }, @Res() res: any) {
-    if (!user.otpEnabled) {
-      throw new BadRequestException('OTP already disabled');
-    }
-
-    await this.authService.disable2FA(user.id);
+    await this.authService.disable2FA(user);
     return res.status(201).json({ msg: 'Two-factor authentication disabled' });
   }
 
@@ -110,15 +94,7 @@ export class AuthController {
   async validate2FA(@Req() req: Request, @Res() res: any, @Body() otp: OTP) {
     const user: SessionUser = req.user as SessionUser;
 
-    if (user.otpValidated) {
-      throw new BadRequestException('OTP already validated');
-    }
-
-    if (!this.authService.is2FACodeValid(otp.code, user.otpSecret!)) {
-      throw new UnauthorizedException('Wrong authentication code');
-    }
-
-    await this.authService.validateOTP(user.id);
+    await this.authService.validateOTP(user, otp);
 
     req.logIn({ ...req.user, otpValidated: true }, function (err: any) {
       if (err) {
