@@ -55,5 +55,36 @@
     <button type="submit">Disable 2FA</button>
   </form>
 </div>
+<br>
+<hr>
+<h1>Profile Info</h1>
+<div>
+  <a href="http://localhost:3000/api/profile">Get Profile Info</a>
+  <br>
+  <br>
+  <form
+    id="profile-info-form"
+    action="http://localhost:3000/api/profile"
+    method="post"
+  >
+    <label for="profile-nickname">Enter your nickname:</label><input
+      type="text"
+      id="profile-nickname"
+      name="nickname"
+      placeholder="Enter your 2FA code here"
+    />
+    <br>
+    <br>
+    <label for="profile-avatar"></label>Enter your avatar:<input
+      type="text"
+      id="profile-avatar"
+      name="avatar"
+      placeholder="Enter your 2FA code here"
+    />
+    <br>
+    <br>
+    <button type="submit">Send Profile Info</button>
+  </form>
+</div>
 </body>
 </html>

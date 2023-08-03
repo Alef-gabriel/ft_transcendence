@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { ProfileEntity } from './profile.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -25,10 +26,4 @@ export class UserEntity {
 
   @Column({ nullable: true })
   otpSecret?: string;
-
-  @Column({ nullable: true })
-  avatar: string;
-
-  @Column({ nullable: true })
-  nickname: string;
 }

@@ -6,11 +6,13 @@ import entities from './db/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserAuthenticatedGuard } from './auth';
 import { UserModule } from './user/user.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    ProfileModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
