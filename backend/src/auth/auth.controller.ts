@@ -1,24 +1,22 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
-  InternalServerErrorException,
   Post,
   Req,
   Res,
   Session,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
   FortyTwoAuthGuard,
-  SessionUser,
+  FortyTwoUser,
   Public,
   OTP,
   TwoFactorAuthentication,
+  ResponseMessage,
 } from './index';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
@@ -31,7 +29,7 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/login')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async login() {
+  async login(): Promise<void> {
     return;
   }
 
@@ -39,26 +37,25 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/redirect')
   @HttpCode(HttpStatus.OK)
-  async redirect() {
+  async redirect(): Promise<ResponseMessage> {
     return { message: 'OK' };
   }
 
   @Get('logout')
   @HttpCode(HttpStatus.OK)
   async logout(
-    @Req() { user }: { user: SessionUser },
-    @Session() session: any,
-  ) {
+    @Req() { user }: { user: FortyTwoUser },
+    @Session() session: Record<string, any>,
+  ): Promise<ResponseMessage> {
     await this.authService.logoutUser(user, session);
     return { message: 'Logout successful' };
   }
 
   @Get('2fa/register')
-  @HttpCode(HttpStatus.OK)
   async register2FA(
-    @Req() { user }: { user: SessionUser },
-    @Res({ passthrough: true }) res: Response,
-  ) {
+    @Req() { user }: { user: FortyTwoUser },
+    @Res() res: Response,
+  ): Promise<any> {
     const otpAuthUrl: string = await this.authService.generate2FASecret(
       user.id,
       user.email,
@@ -67,17 +64,13 @@ export class AuthController {
   }
 
   @Post('2fa/turn-on')
-  @HttpCode(HttpStatus.CREATED)
-  async turnOn2FA(@Req() { user }: { user: SessionUser }, @Body() otp: OTP) {
-    await this.authService.enable2FA(user, otp);
-    return { msg: 'Two-factor authentication enabled' };
-  }
-
-  @Post('2fa/turn-off')
-  @HttpCode(HttpStatus.CREATED)
-  async turnOff2FA(@Req() { user }: { user: SessionUser }) {
-    await this.authService.disable2FA(user);
-    return { msg: 'Two-factor authentication disabled' };
+  async turnOn2FA(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() otp: OTP,
+  ): Promise<any> {
+    await this.authService.enable2FA(req.user as FortyTwoUser, otp);
+    await this.authService.login2FAUser(req, res);
   }
 
   @TwoFactorAuthentication()
@@ -86,24 +79,32 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
     @Body() otp: OTP,
-  ) {
-    await this.authService.validateOTP(req.user as SessionUser, otp);
+  ): Promise<any> {
+    await this.authService.validateOTP(req.user as FortyTwoUser, otp);
     await this.authService.login2FAUser(req, res);
-    //return { msg: 'Two-factor authentication validated' };
+  }
+
+  @Post('2fa/turn-off')
+  @HttpCode(HttpStatus.CREATED)
+  async turnOff2FA(
+    @Req() { user }: { user: FortyTwoUser },
+  ): Promise<ResponseMessage> {
+    await this.authService.disable2FA(user);
+    return { message: 'Two-factor authentication disabled' };
   }
 
   // Debug route to check if user is authenticated
   @Get('status')
   @HttpCode(HttpStatus.OK)
-  async status() {
-    return { msg: 'Authenticated' };
+  async status(): Promise<ResponseMessage> {
+    return { message: 'Authenticated' };
   }
 
   // Debug route to check if it's public
   @Public()
   @Get('public')
   @HttpCode(HttpStatus.OK)
-  async public() {
-    return { msg: '@Public route' };
+  async public(): Promise<ResponseMessage> {
+    return { message: '@Public route' };
   }
 }

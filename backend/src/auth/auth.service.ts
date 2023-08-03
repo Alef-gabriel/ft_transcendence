@@ -11,7 +11,7 @@ import { authenticator } from 'otplib';
 import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { toFileStream } from 'qrcode';
-import { OTP, SessionUser } from './index';
+import { OTP, FortyTwoUser } from './index';
 
 //TODO: Criar Módulo User, refatorar o código, criar UserService e UserRepository
 //TODO: Ao invés de salvar o OTP secret no cookie, procurar no banco de dados
@@ -24,7 +24,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async loginUser(user: SessionUser) {
+  async loginUser(user: FortyTwoUser) {
     this.logger.debug(`### OAuth2 user: ${JSON.stringify(user)}`);
 
     const userEntity: UserEntity = this.convertSessionToEntity(user);
@@ -45,8 +45,8 @@ export class AuthService {
     return this.convertEntityToSession(await this.userService.save(newUser));
   }
 
+  //Create new session for the two factor authenticated user, using express-session
   async login2FAUser(req: Request, res: Response) {
-    //Create new session for the two factor authenticated user, using express-session
     req.logIn({ ...req.user, otpValidated: true }, function (err: any) {
       if (err) {
         throw new InternalServerErrorException('Error on logIn');
@@ -54,11 +54,11 @@ export class AuthService {
 
       return res
         .status(201)
-        .json({ msg: 'Two-factor authentication validated' });
+        .json({ message: 'Two-factor authentication validated' });
     });
   }
 
-  async logoutUser(user: SessionUser, session: any): Promise<void> {
+  async logoutUser(user: FortyTwoUser, session: any): Promise<void> {
     if (session) {
       session.destroy();
     }
@@ -67,7 +67,7 @@ export class AuthService {
     }
   }
 
-  async enable2FA(user: SessionUser, otp: OTP): Promise<void> {
+  async enable2FA(user: FortyTwoUser, otp: OTP): Promise<void> {
     if (user.otpEnabled) {
       throw new BadRequestException('OTP already enabled');
     }
@@ -79,7 +79,7 @@ export class AuthService {
     await this.userService.enable2FA(user.id);
   }
 
-  async disable2FA(user: SessionUser): Promise<void> {
+  async disable2FA(user: FortyTwoUser): Promise<void> {
     if (!user.otpEnabled) {
       throw new BadRequestException('OTP already disabled');
     }
@@ -87,7 +87,7 @@ export class AuthService {
     await this.userService.disable2FA(user.id);
   }
 
-  async validateOTP(user: SessionUser, otp: OTP): Promise<void> {
+  async validateOTP(user: FortyTwoUser, otp: OTP): Promise<void> {
     if (user.otpValidated) {
       throw new BadRequestException('OTP already validated');
     }
@@ -137,7 +137,7 @@ export class AuthService {
     return toFileStream(stream, otpauthUrl);
   }
 
-  private convertSessionToEntity(user: SessionUser): UserEntity {
+  private convertSessionToEntity(user: FortyTwoUser): UserEntity {
     const {
       id,
       username,
@@ -162,7 +162,7 @@ export class AuthService {
     return userEntity;
   }
 
-  private convertEntityToSession(userEntity: UserEntity): SessionUser {
+  private convertEntityToSession(userEntity: UserEntity): FortyTwoUser {
     const {
       id,
       username,

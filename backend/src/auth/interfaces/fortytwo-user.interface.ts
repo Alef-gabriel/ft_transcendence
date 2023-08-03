@@ -1,4 +1,4 @@
-export interface SessionUser {
+export interface FortyTwoUser {
   id: number;
   username: string;
   displayName: string;

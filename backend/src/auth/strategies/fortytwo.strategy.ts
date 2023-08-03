@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
-import { SessionUser } from '../index';
+import { FortyTwoUser } from '../index';
 
 //This class is used to do 42 OAuth2 authentication
 @Injectable()
@@ -26,7 +26,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     accessToken: string,
     refreshToken: string,
     profile: any,
-  ): Promise<SessionUser> {
+  ): Promise<FortyTwoUser> {
     this.logger.verbose(`### Validating user ${profile.id} with 42 strategy`);
     const {
       id,
@@ -37,7 +37,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
       otpEnabled,
       otpSecret,
     } = profile;
-    const user: SessionUser = await this.authService.loginUser({
+    const user: FortyTwoUser = await this.authService.loginUser({
       id,
       username,
       displayName,
