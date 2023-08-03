@@ -6,7 +6,7 @@ import migrations from './migrations';
 
 config();
 
-const configService = new ConfigService();
+const configService: ConfigService<Record<string, any>> = new ConfigService();
 
 const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',

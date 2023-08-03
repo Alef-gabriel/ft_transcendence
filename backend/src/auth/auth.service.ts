@@ -11,10 +11,8 @@ import { authenticator } from 'otplib';
 import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { toFileStream } from 'qrcode';
-import { OTP, FortyTwoUser } from './index';
+import { FortyTwoUser, OTP } from './index';
 
-//TODO: Criar Módulo User, refatorar o código, criar UserService e UserRepository
-//TODO: Ao invés de salvar o OTP secret no cookie, procurar no banco de dados
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);

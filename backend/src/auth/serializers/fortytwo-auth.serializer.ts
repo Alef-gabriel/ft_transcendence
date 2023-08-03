@@ -16,7 +16,7 @@ export class SessionSerializer extends PassportSerializer {
     user: FortyTwoUser,
     done: (err: any, user: FortyTwoUser) => void,
   ) {
-    this.logger.verbose(`### Serializing user ${user.id}`);
+    this.logger.verbose(`### Serializing user [${user.id}]`);
     done(null, user);
   }
 
@@ -24,7 +24,7 @@ export class SessionSerializer extends PassportSerializer {
     payload: FortyTwoUser,
     done: (err: any, user: FortyTwoUser | null) => void,
   ) {
-    this.logger.verbose(`### Deserializing user ${payload.id}`);
+    this.logger.verbose(`### Deserializing user [${payload.id}]`);
     const user = await this.userService.findById(payload.id);
     return user ? done(null, user) : done(null, null);
   }

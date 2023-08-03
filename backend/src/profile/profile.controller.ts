@@ -6,12 +6,10 @@ import {
   HttpStatus,
   Post,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { FortyTwoAuthGuard, FortyTwoUser, Public } from '../auth';
+import { FortyTwoUser } from '../auth';
 import { ProfileEntity } from '../db/entities';
-import { Request } from 'express';
 import { Profile } from './interfaces/profile.interface';
 
 @Controller('profile')
