@@ -13,6 +13,11 @@ async function bootstrap() {
   const logger = new Logger(bootstrap.name);
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'debug', 'log', 'verbose'],
+    cors: {
+      origin: configService.get<string>('APP_CORS_ORIGIN') || '*',
+      methods: 'GET,PUT,POST,DELETE',
+      credentials: true,
+    },
   });
 
   app.setGlobalPrefix('api');

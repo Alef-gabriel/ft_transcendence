@@ -57,7 +57,7 @@
 </div>
 <br>
 <hr>
-<h1>Profile Info</h1>
+<h1>Send Profile Info</h1>
 <div>
   <a href="http://localhost:3000/api/profile">Get Profile Info</a>
   <br>
@@ -86,5 +86,31 @@
     <button type="submit">Send Profile Info</button>
   </form>
 </div>
+<br>
+<h1>Receive Profile Info</h1>
+<div id="responseContainer">
+  <button id="fetchButton">Fetch <Info></Info></button>
+  <p id="responseText">Response will be displayed here</p>
+</div>
+
+<script>
+  const fetchButton = document.getElementById('fetchButton');
+  const responseText = document.getElementById('responseText');
+
+  fetchButton.addEventListener('click', () => {
+    fetch('http://localhost:3000/api/profile', {
+      method: 'GET',
+      credentials: 'include',
+      })
+      .then(response => response.json()) // Assuming the response is plain text
+      .then(data => {
+        responseText.textContent = JSON.stringify(data);
+      })
+      .catch(error => {
+        responseText.textContent = 'Error fetching data from the backend';
+        console.error(error);
+      });
+  });
+</script>
 </body>
 </html>

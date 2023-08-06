@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { FortyTwoUser } from '../auth';
+import { FortyTwoUser, Public } from '../auth';
 import { ProfileEntity } from '../db/entities';
 import { Profile } from './interfaces/profile.interface';
 
@@ -16,6 +16,7 @@ import { Profile } from './interfaces/profile.interface';
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
+  //TODO: Create DTO for ProfileEntity with partial fields, exclude userEntity
   @Get()
   @HttpCode(HttpStatus.OK)
   async getProfile(
