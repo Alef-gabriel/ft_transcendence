@@ -22,7 +22,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async loginUser(user: FortyTwoUser) {
+  async loginUser(user: FortyTwoUser): Promise<FortyTwoUser> {
     this.logger.debug(`### OAuth2 user: ${JSON.stringify(user)}`);
 
     const userEntity: UserEntity = this.convertSessionToEntity(user);
@@ -38,22 +38,25 @@ export class AuthService {
       return this.convertEntityToSession(databaseUser);
     }
 
-    this.logger.debug(`### User ${user.id} not found. Creating new user`);
+    this.logger.log(`### User ${user.id} not found. Creating new user`);
     const newUser: UserEntity = await this.userService.create(userEntity);
     return this.convertEntityToSession(await this.userService.save(newUser));
   }
 
   //Create new session for the two factor authenticated user, using express-session
-  async login2FAUser(req: Request, res: Response) {
-    req.logIn({ ...req.user, otpValidated: true }, function (err: any) {
-      if (err) {
-        throw new InternalServerErrorException('Error on logIn');
-      }
+  async login2FAUser(req: Request, res: Response): Promise<void> {
+    const user: FortyTwoUser = req.user as FortyTwoUser;
 
+    req.logIn({ ...user, otpValidated: true }, function (err: any) {
+      if (err) {
+        throw new InternalServerErrorException('Error on logIn with 2FA');
+      }
       return res
         .status(201)
         .json({ message: 'Two-factor authentication validated' });
     });
+
+    this.logger.log(`### User [${user.id}] logged in with 2FA successfully`);
   }
 
   async logoutUser(user: FortyTwoUser, session: any): Promise<void> {
@@ -63,6 +66,8 @@ export class AuthService {
     if (user.otpValidated) {
       await this.invalidateOTP(user.id);
     }
+
+    this.logger.log(`### User [${user.id}] logged out successfully`);
   }
 
   async enable2FA(user: FortyTwoUser, otp: OTP): Promise<void> {
@@ -75,6 +80,8 @@ export class AuthService {
     }
 
     await this.userService.enable2FA(user.id);
+
+    this.logger.log(`### User [${user.id}] enabled 2FA successfully`);
   }
 
   async disable2FA(user: FortyTwoUser): Promise<void> {
@@ -83,6 +90,7 @@ export class AuthService {
     }
 
     await this.userService.disable2FA(user.id);
+    this.logger.log(`### User [${user.id}] disabled 2FA successfully`);
   }
 
   async validateOTP(user: FortyTwoUser, otp: OTP): Promise<void> {
@@ -95,14 +103,17 @@ export class AuthService {
     }
 
     await this.userService.validateOTP(user.id);
+    this.logger.log(`### User [${user.id}] validated OTP successfully`);
   }
 
   async invalidateOTP(id: number): Promise<void> {
     await this.userService.invalidateOTP(id);
+    this.logger.log(`### User [${id}] invalidated OTP successfully`);
   }
 
   public async add2FASecret(id: number, secret: string): Promise<void> {
     await this.userService.add2FASecret(id, secret);
+    this.logger.log(`### User [${id}] added 2FA secret successfully`);
   }
 
   public is2FACodeValid(code: string, secret: string): boolean {
@@ -122,7 +133,11 @@ export class AuthService {
       secret,
     );
 
+    this.logger.log(`### User [${id}] has generated 2FA secret successfully`);
+
     await this.add2FASecret(id, secret);
+
+    this.logger.log(`### User [${id}] has added 2FA secret successfully`);
 
     return otpAuthUrl;
   }
@@ -132,6 +147,7 @@ export class AuthService {
     otpauthUrl: string,
   ): Promise<void> {
     //toDataURL()
+    this.logger.verbose(`### Generating QR Code for ${otpauthUrl}`);
     return toFileStream(stream, otpauthUrl);
   }
 
