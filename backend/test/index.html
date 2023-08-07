@@ -119,6 +119,11 @@
   </button>
   <p id="responseText">Response will be displayed here</p>
 </div>
+<br>
+<h1>Delete Profile Info</h1>
+<div id="delete-container">
+  <button id="delete-button">Delete Data</button>
+</div>
 
 <script>
   const fetchButton = document.getElementById("fetchButton");
@@ -139,35 +144,35 @@
       });
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('data-form');
-    const submitButton = document.getElementById('submit-button');
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("data-form");
+    const submitButton = document.getElementById("submit-button");
 
-    submitButton.addEventListener('click', function() {
+    submitButton.addEventListener("click", function() {
       const formData = new FormData(form);
 
       // Create an object to hold the data to be sent to the backend
       const sendData = {};
 
       // Check if the user selected the 'nickname' option
-      if (formData.get('option') === 'nickname') {
-        sendData.nickname = formData.get('nickname');
+      if (formData.get("option") === "nickname") {
+        sendData.nickname = formData.get("nickname");
       }
 
       // Check if the user selected the 'avatar' option
-      if (formData.get('option2') === 'avatar') {
-        sendData.avatar = formData.get('avatar');
+      if (formData.get("option2") === "avatar") {
+        sendData.avatar = formData.get("avatar");
       }
-      console.log(sendData)
+      console.log(sendData);
 
       // Perform the PUT request to the backend (replace with actual API endpoint)
       // You can use libraries like Axios or Fetch to make the request
       // Example using Fetch:
-      fetch('http://localhost:3000/api/profile', {
-        method: 'PUT',
+      fetch("http://localhost:3000/api/profile", {
+        method: "PUT",
         credentials: "include",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(sendData)
       })
@@ -178,7 +183,37 @@
         })
         .catch(error => {
           // Handle error
-          console.error('Error:', error);
+          console.error("Error:", error);
+        });
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const deleteButton = document.getElementById("delete-button");
+
+    deleteButton.addEventListener("click", function() {
+      // Perform the DELETE request to the backend (replace with actual API endpoint)
+      // You can use libraries like Axios or Fetch to make the request
+      // Example using Fetch:
+      fetch("http://localhost:3000/api/profile", {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+        .then(response => {
+          if (response.ok) {
+            // Handle successful response from the backend
+            console.log("Data deleted successfully");
+          } else {
+            // Handle error response from the backend
+            console.error("Error deleting data");
+          }
+        })
+        .catch(error => {
+          // Handle network or other errors
+          console.error("Error:", error);
         });
     });
   });
