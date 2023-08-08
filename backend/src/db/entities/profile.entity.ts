@@ -6,9 +6,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { Profile } from '../../profile/interfaces/profile.interface';
 
 @Entity({ name: 'profiles' })
-export class ProfileEntity {
+export class ProfileEntity implements Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,6 +22,7 @@ export class ProfileEntity {
   @OneToOne(() => UserEntity, {
     eager: true,
     cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn()
   userEntity: UserEntity;

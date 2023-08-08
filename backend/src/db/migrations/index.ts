@@ -1,8 +1,7 @@
-import { CreateTables1690933317296 } from './1690933317296-create-tables';
-import { ProfileEntity1691035719034 } from './1691035719034-profile-entity';
+import { UserAndProfileTables1691457248059 } from './1691457248059-user-and-profile-tables';
 
-const migrations = [CreateTables1690933317296, ProfileEntity1691035719034];
+const migrations = [UserAndProfileTables1691457248059];
 
-export { CreateTables1690933317296, ProfileEntity1691035719034 };
+export { UserAndProfileTables1691457248059 };
 
 export default migrations;

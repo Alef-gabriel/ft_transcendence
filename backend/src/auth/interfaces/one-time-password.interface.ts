@@ -1,3 +1,3 @@
-export interface OTP {
+export interface OneTimePassword {
   code: string;
 }

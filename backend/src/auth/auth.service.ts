@@ -11,7 +11,7 @@ import { authenticator } from 'otplib';
 import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { toFileStream } from 'qrcode';
-import { FortyTwoUser, OTP } from './index';
+import { FortyTwoUser, OneTimePassword } from './index';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +38,7 @@ export class AuthService {
       return this.convertEntityToSession(databaseUser);
     }
 
-    this.logger.log(`### User ${user.id} not found. Creating new user`);
+    this.logger.log(`### User [${user.id}] not found. Creating new user`);
     const newUser: UserEntity = await this.userService.create(userEntity);
     return this.convertEntityToSession(await this.userService.save(newUser));
   }
@@ -70,7 +70,7 @@ export class AuthService {
     this.logger.log(`### User [${user.id}] logged out successfully`);
   }
 
-  async enable2FA(user: FortyTwoUser, otp: OTP): Promise<void> {
+  async enable2FA(user: FortyTwoUser, otp: OneTimePassword): Promise<void> {
     if (user.otpEnabled) {
       throw new BadRequestException('OTP already enabled');
     }
@@ -93,7 +93,7 @@ export class AuthService {
     this.logger.log(`### User [${user.id}] disabled 2FA successfully`);
   }
 
-  async validateOTP(user: FortyTwoUser, otp: OTP): Promise<void> {
+  async validateOTP(user: FortyTwoUser, otp: OneTimePassword): Promise<void> {
     if (user.otpValidated) {
       throw new BadRequestException('OTP already validated');
     }
@@ -124,8 +124,8 @@ export class AuthService {
   }
 
   public async generate2FASecret(id: number, email: string): Promise<string> {
-    const secret = authenticator.generateSecret();
-    const otpAuthUrl = authenticator.keyuri(
+    const secret: string = authenticator.generateSecret();
+    const otpAuthUrl: string = authenticator.keyuri(
       email,
       String(
         this.configService.get<string>('APP_TWO_FACTOR_AUTHENTICATION_NAME'),

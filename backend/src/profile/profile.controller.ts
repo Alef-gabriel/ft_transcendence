@@ -10,11 +10,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { FortyTwoUser, Public } from '../auth';
-import { ProfileEntity } from '../db/entities';
+import { FortyTwoUser } from '../auth';
 import { Profile } from './interfaces/profile.interface';
-import { ProfileUpdatedResponse } from './interfaces/profile-updated-respose.interface';
-import { ProfileDeletedResponse } from './interfaces/profile-deleted-response.interface';
+import { FortyTwoUserDto } from '../auth/models/forty-two-user.dto';
+import { ProfileDto } from './models/profile.dto';
+import { ProfileUpdatedResponseDto } from './models/profile-updated-response.dto';
+import { ProfileDeletedResponseDto } from './models/profile-delete-response.dto';
 
 @Controller('profile')
 export class ProfileController {
@@ -22,15 +23,17 @@ export class ProfileController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getProfile(@Req() { user }: { user: FortyTwoUser }): Promise<Profile> {
+  async getProfile(
+    @Req() { user }: { user: FortyTwoUserDto },
+  ): Promise<Profile> {
     return await this.profileService.findById(user.id);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async saveProfile(
-    @Req() { user }: { user: FortyTwoUser },
-    @Body() profile: Profile,
+    @Req() { user }: { user: FortyTwoUserDto },
+    @Body() profile: ProfileDto,
   ): Promise<Profile> {
     return await this.profileService.save(user.id, profile);
   }
@@ -38,9 +41,9 @@ export class ProfileController {
   @Put()
   @HttpCode(HttpStatus.CREATED)
   async updateProfile(
-    @Req() { user }: { user: FortyTwoUser },
-    @Body() profile: Partial<Profile>,
-  ): Promise<ProfileUpdatedResponse> {
+    @Req() { user }: { user: FortyTwoUserDto },
+    @Body() profile: Partial<ProfileDto>,
+  ): Promise<ProfileUpdatedResponseDto> {
     return await this.profileService.update(user.id, profile);
   }
 
@@ -48,7 +51,7 @@ export class ProfileController {
   @HttpCode(HttpStatus.OK)
   async deleteProfile(
     @Req() { user }: { user: FortyTwoUser },
-  ): Promise<ProfileDeletedResponse> {
+  ): Promise<ProfileDeletedResponseDto> {
     return await this.profileService.delete(user.id);
   }
 }

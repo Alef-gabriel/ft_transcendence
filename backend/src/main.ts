@@ -6,7 +6,7 @@ import { TypeormStore } from 'connect-typeorm';
 import { DataSource } from 'typeorm';
 import { SessionEntity } from './db/entities';
 import { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const configService = new ConfigService();
@@ -19,7 +19,6 @@ async function bootstrap() {
       credentials: true,
     },
   });
-
   app.setGlobalPrefix('api');
   app.use(
     session({
@@ -38,6 +37,7 @@ async function bootstrap() {
       }).connect(app.get(DataSource).getRepository(SessionEntity)),
     }),
   );
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(passport.initialize());
   app.use(passport.session());
   await app.listen(Number(configService.get<number>('APP_PORT')) || 3000);

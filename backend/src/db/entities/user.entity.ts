@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { FortyTwoUser } from '../../auth';
 
 @Entity({ name: 'users' })
-export class UserEntity {
+export class UserEntity implements FortyTwoUser {
   @PrimaryColumn()
   id: number;
 

@@ -5,7 +5,7 @@ import { SessionSerializer } from './serializers/fortytwo-auth.serializer';
 import { FortyTwoStrategy } from './strategies/fortytwo.strategy';
 import { Public } from './decorators/public.decorator';
 import { TwoFactorAuthentication } from './decorators/two-factor-auth.decorator';
-import { OTP } from './interfaces/one-time-password.interface';
+import { OneTimePassword } from './interfaces/one-time-password.interface';
 import { ResponseMessage } from './interfaces/response-message.interface';
 
 export {
@@ -14,7 +14,7 @@ export {
   FortyTwoStrategy,
   FortyTwoUser,
   SessionSerializer,
-  OTP,
+  OneTimePassword,
   ResponseMessage,
   Public,
   TwoFactorAuthentication,

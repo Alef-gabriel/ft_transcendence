@@ -42,7 +42,7 @@ export class UserAuthenticatedGuard implements CanActivate {
       return false;
     }
 
-    const user = request.user as FortyTwoUser;
+    const user: FortyTwoUser = request.user as FortyTwoUser;
 
     //Allow if user is authenticated and 2FA is not enabled
     if (!request.user.otpEnabled) {

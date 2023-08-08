@@ -7,10 +7,16 @@ import {
 import { UserService } from '../user/user.service';
 import { ProfileEntity, UserEntity } from '../db/entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository, UpdateResult } from 'typeorm';
+import {
+  DeleteResult,
+  QueryFailedError,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { Profile } from './interfaces/profile.interface';
-import { ProfileUpdatedResponse } from './interfaces/profile-updated-respose.interface';
-import { ProfileDeletedResponse } from './interfaces/profile-deleted-response.interface';
+import { ProfileDeletedResponseDto } from './models/profile-delete-response.dto';
+import { ProfileUpdatedResponseDto } from './models/profile-updated-response.dto';
+import { ProfileDto } from './models/profile.dto';
 
 @Injectable()
 export class ProfileService {
@@ -22,14 +28,14 @@ export class ProfileService {
     private readonly profileRepository: Repository<ProfileEntity>,
   ) {}
 
-  async findById(id: number): Promise<Profile> {
+  async findById(id: number): Promise<ProfileDto> {
     const profileEntity: ProfileEntity | null =
       await this.profileRepository.findOneBy({
         userEntity: { id },
       });
 
     if (!profileEntity) {
-      throw new NotFoundException(`User ${id} not found`);
+      throw new NotFoundException(`User [${id}] not found`);
     }
 
     this.logger.log(`Profile found for user [${id}]`);
@@ -43,7 +49,7 @@ export class ProfileService {
     const userEntity: UserEntity | null = await this.userService.findById(id);
 
     if (!userEntity) {
-      throw new NotFoundException(`User ${id} not found`);
+      throw new NotFoundException(`User [${id}] not found`);
     }
 
     const profileEntity: ProfileEntity = new ProfileEntity();
@@ -57,7 +63,7 @@ export class ProfileService {
     } catch (Exception) {
       if (Exception instanceof QueryFailedError) {
         this.logger.error(`Profile already exists for user [${id}]`);
-        throw new BadRequestException(`user ${id} already has a profile`);
+        throw new BadRequestException(`user [${id}] already has a profile`);
       }
       throw Exception;
     }
@@ -72,7 +78,7 @@ export class ProfileService {
   async update(
     id: number,
     profile: Partial<Profile>,
-  ): Promise<ProfileUpdatedResponse> {
+  ): Promise<ProfileUpdatedResponseDto> {
     const updateResult: UpdateResult = await this.profileRepository.update(
       { userEntity: { id } },
       profile,
@@ -82,7 +88,7 @@ export class ProfileService {
       this.logger.error(
         `Profile not found for user [${id}], nothing to update`,
       );
-      throw new NotFoundException(`User ${id} not found`);
+      throw new NotFoundException(`User [${id}] not found`);
     }
 
     this.logger.log(`Profile updated for user [${id}]`);
@@ -92,22 +98,18 @@ export class ProfileService {
     };
   }
 
-  async delete(id: number): Promise<ProfileDeletedResponse> {
-    const deleteResult = await this.profileRepository.delete({
-      userEntity: { id },
-    });
+  async delete(id: number): Promise<ProfileDeletedResponseDto> {
+    const userDeleteResult: DeleteResult = await this.userService.delete(id);
 
-    if (!deleteResult.affected) {
-      this.logger.error(
-        `Profile not found for user [${id}], nothing to delete`,
-      );
-      throw new NotFoundException(`User ${id} not found`);
+    if (!userDeleteResult.affected) {
+      this.logger.error(`### User [${id}] not found, nothing to delete`);
+      throw new NotFoundException(`User [${id}] not found`);
     }
 
-    this.logger.log(`Profile deleted for user [${id}]`);
+    this.logger.log(`### User [${id}] and profile deleted`);
     return {
-      deleted: deleteResult.affected > 0,
-      affected: deleteResult.affected,
+      deleted: userDeleteResult.affected > 0,
+      affected: userDeleteResult.affected,
     };
   }
 }
