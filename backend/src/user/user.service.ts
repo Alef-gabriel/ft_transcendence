@@ -52,6 +52,7 @@ export class UserService {
     this.logger.verbose(`### Enabling user [${id}] OTP`);
     await this.userRepository.update(id, {
       otpEnabled: true,
+      otpValidated: true,
     });
   }
 
@@ -59,6 +60,7 @@ export class UserService {
     this.logger.verbose(`### Enabling user [${id}] OTP`);
     await this.userRepository.update(id, {
       otpEnabled: false,
+      otpValidated: false,
     });
   }
 
