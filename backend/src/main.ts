@@ -6,12 +6,12 @@ import { TypeormStore } from 'connect-typeorm';
 import { DataSource } from 'typeorm';
 import { SessionEntity } from './db/entities';
 import { ConfigService } from '@nestjs/config';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const configService = new ConfigService();
-  const logger = new Logger(bootstrap.name);
-  const app = await NestFactory.create(AppModule, {
+  const configService: ConfigService<Record<string, any>> = new ConfigService();
+  const logger: Logger = new Logger(bootstrap.name);
+  const app: INestApplication = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'debug', 'log', 'verbose'],
     cors: {
       origin: configService.get<string>('APP_CORS_ORIGIN') || '*',

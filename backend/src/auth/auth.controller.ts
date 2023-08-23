@@ -38,8 +38,8 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/redirect')
   @HttpCode(HttpStatus.OK)
-  async redirect(): Promise<ResponseMessage> {
-    return { message: 'OK' };
+  async redirect(@Res() res: Response): Promise<void> {
+    res.redirect('http://localhost:5173');
   }
 
   @Get('logout')

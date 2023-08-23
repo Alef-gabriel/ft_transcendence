@@ -40,7 +40,7 @@ import { ProfileModule } from './profile/profile.module';
       useFactory: async (
         configService: ConfigService,
         userAuthGuard: UserAuthenticatedGuard,
-      ) =>
+      ): Promise<UserAuthenticatedGuard | null> =>
         configService.get<string>('APP_OAUTH2_ENABLED') === 'true'
           ? userAuthGuard
           : null,
