@@ -1,10 +1,54 @@
-import { Link } from 'react-router-dom'
+import { Link, NavigateFunction } from "react-router-dom";
+import { FormEvent, MutableRefObject, useEffect, useRef } from "react";
+import { AuthContextData, UserRegisterInfo } from "../../utils/interfaces/AuthContextData.ts";
+import { useAuth } from "../../utils/AuthContext.tsx";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const registerForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
+  const {user, registerUser} = useAuth() as AuthContextData;
+  const navigate: NavigateFunction = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, []);
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+
+    if (!registerForm.current) {
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const name: string = registerForm.current?.name.value;
+    const email: string = registerForm.current?.email.value;
+    const password1: string = registerForm.current?.password1.value;
+    const password2: string = registerForm.current?.password2.value;
+
+    if (password1 !== password2) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    const userRegisterInfo: UserRegisterInfo = {
+      name,
+      email,
+      password1,
+      password2
+    }
+
+    registerUser(userRegisterInfo);
+  }
+
   return (
     <div className="container">
       <div className="login-register-container">
-        <form>
+
+        <form ref={registerForm} onSubmit={handleSubmit}>
 
           <div className="form-field-wrapper">
                 <label>Name:</label>
