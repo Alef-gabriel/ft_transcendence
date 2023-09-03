@@ -6,18 +6,24 @@ import Home from './pages/Home.js'
 import Profile from './pages/Profile.js'
 import Login from './pages/Login.js'
 import Register from './pages/Register.js'
+import PrivateRoutes from "../utils/PrivateRoutes.tsx";
+import { AuthProvider } from "../utils/AuthContext.tsx";
 
 function App() {
 
   return (
     <Router>
-        <Header/>
-        <Routes>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/register" element={<Register/>}/>
-          <Route path="/" element={<Home/>}/>
-          <Route path="/profile" element={<Profile/>}/>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login/>}/>
+            <Route path="/register" element={<Register/>}/>
+            <Route element={<PrivateRoutes/>}>
+              <Route path="/" element={<Home/>}/>
+              <Route path="/profile" element={<Profile/>}/>
+            </Route>
+          </Routes>
+          <Header/>
+        </AuthProvider>
     </Router>
   )
 }
