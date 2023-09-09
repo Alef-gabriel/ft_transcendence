@@ -8,7 +8,7 @@ const Header = () => {
   return (
     <div className="header">
       <div>
-        <Link id="header-logo" to="/">LOGO</Link>
+        <Link id="header-logo" to="/">Pong</Link>
       </div>
 
       <div className="links--wrapper">
@@ -18,8 +18,9 @@ const Header = () => {
             <Link to="/profile" className="header--link">Profile</Link>
             <button onClick={logoutUser} className="btn">Logout</button>
           </>
-        ):(
-          <Link className="btn" to="/login">Login</Link>
+        ): (
+          <>
+          </>
         )}
       </div>
     </div>

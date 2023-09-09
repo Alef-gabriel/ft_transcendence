@@ -1,4 +1,4 @@
-import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 import { FormEvent, MutableRefObject, useEffect, useRef } from "react";
 import { AuthContextData, UserInfo } from "../../utils/interfaces/AuthContextData.ts";
 import { useAuth } from "../../utils/AuthContext.tsx";
@@ -36,38 +36,22 @@ const Login = () => {
   return (
     <div className="container">
         <div className="login-register-container">
+
+          <div className="login-logo-wrapper">
+            <img src= "../../public/logo/fortytwo.png" alt="Your Image" />
+          </div>
+
           <form ref={loginForm} onSubmit={handleSubmit}>
-
-            <div className="form-field-wrapper">
-                <label>Email:</label>
-                <input 
-                  required
-                  type="email" 
-                  name="email"
-                  placeholder="Enter email..."
-                  />
-            </div>
-
-            <div className="form-field-wrapper">
-                <label>Password:</label>
-                <input 
-                  type="password" 
-                  name="password"
-                  placeholder="Enter password..."
-                  />
-            </div>
-
             <div className="form-field-wrapper">
                 <input 
                   type="submit" 
-                  value="Login"
+                  value="Login with 42"
                   className="btn"
                   />
             </div>
 
           </form>
 
-          <p>Don't have an account? <Link to="/register">Register</Link></p>
 
         </div>
     </div>
