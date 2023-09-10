@@ -62,16 +62,13 @@ export class AuthController {
     return { message: 'Logout successful' };
   }
 
-  @Get('2fa/register')
-  async register2FA(
-    @Req() { user }: { user: FortyTwoUserDto },
-    @Res() res: Response,
-  ): Promise<any> {
+  @Get('2fa/qr-code')
+  async qrCode2FA(@Req() { user }: { user: FortyTwoUserDto }): Promise<any> {
     const otpAuthUrl: string = await this.authService.generate2FASecret(
       user.id,
       user.email,
     );
-    return this.authService.pipeQrCodeStream(res, otpAuthUrl);
+    return this.authService.qrCodeToDataURL(otpAuthUrl);
   }
 
   @Post('2fa/turn-on')
@@ -84,6 +81,15 @@ export class AuthController {
     await this.authService.login2FAUser(req, res);
   }
 
+  @Post('2fa/turn-off')
+  @HttpCode(HttpStatus.CREATED)
+  async turnOff2FA(
+    @Req() { user }: { user: FortyTwoUserDto },
+  ): Promise<ResponseMessage> {
+    await this.authService.disable2FA(user);
+    return { message: 'Two-factor authentication disabled' };
+  }
+
   @TwoFactorAuthentication()
   @Post('2fa/validate')
   async validate2FA(
@@ -93,15 +99,6 @@ export class AuthController {
   ): Promise<any> {
     await this.authService.validateOTP(req.user as FortyTwoUserDto, otp);
     await this.authService.login2FAUser(req, res);
-  }
-
-  @Post('2fa/turn-off')
-  @HttpCode(HttpStatus.CREATED)
-  async turnOff2FA(
-    @Req() { user }: { user: FortyTwoUserDto },
-  ): Promise<ResponseMessage> {
-    await this.authService.disable2FA(user);
-    return { message: 'Two-factor authentication disabled' };
   }
 
   @Get('session')

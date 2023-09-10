@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
 import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
-import { toFileStream } from 'qrcode';
+import { toDataURL, toFileStream } from 'qrcode';
 import { FortyTwoUser, OneTimePassword } from './index';
 
 @Injectable()
@@ -149,6 +149,10 @@ export class AuthService {
     //toDataURL()
     this.logger.verbose(`### Generating QR Code for ${otpauthUrl}`);
     return toFileStream(stream, otpauthUrl);
+  }
+
+  public async qrCodeToDataURL(otpAuthUrl: string): Promise<string> {
+    return await toDataURL(otpAuthUrl);
   }
 
   private convertSessionToEntity(user: FortyTwoUser): UserEntity {
