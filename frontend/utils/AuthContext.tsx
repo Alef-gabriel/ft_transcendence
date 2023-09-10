@@ -1,6 +1,7 @@
 import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
 import { AuthContextData } from "./interfaces/AuthContextData.ts";
 import axios from "axios";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 const AuthContext = createContext({});
 
@@ -10,13 +11,14 @@ interface AuthProviderProps {
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children } ) => {
 
+  const navigate: NavigateFunction = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser ] = useState<boolean | null>(null);
 
   useEffect(() => {
     //const user = sessionStorage.getItem('user');
     validateUserSession();
-  }, []);
+  }, [navigate]);
 
 
   const logoutUser = async () => {
@@ -27,17 +29,19 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children } ) => {
     } catch (error) {
       console.log(error);
     }
+
+    setLoading(false)
   }
 
   const validateUserSession = async () => {
     //Trocar para obter infomrações do usuário e setar no contexto
 
     try {
-      const statusResponse = await axios.get('http://localhost:3000/api/auth/status',
+      const statusResponse = await axios.get('http://localhost:3000/api/auth/session',
         { withCredentials: true });
 
       if (statusResponse.status === 200) {
-        console.log("User is logged in");
+        console.log(JSON.stringify(statusResponse.data));
         setUser(true);
       }
 

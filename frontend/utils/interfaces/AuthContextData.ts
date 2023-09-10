@@ -1,5 +1,8 @@
+import { FortyTwoUser } from "../../../backend/src/auth";
+
 export interface AuthContextData {
-  user: boolean | null;
+  //user: FortyTwoUser | null;
+  user: boolean
   logoutUser: () => void;
   register2FA: () => void;
 }

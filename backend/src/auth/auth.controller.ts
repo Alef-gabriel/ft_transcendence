@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
   Req,
   Res,
@@ -25,6 +26,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger: Logger = new Logger(AuthController.name);
+
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
@@ -99,6 +102,16 @@ export class AuthController {
   ): Promise<ResponseMessage> {
     await this.authService.disable2FA(user);
     return { message: 'Two-factor authentication disabled' };
+  }
+
+  @Get('session')
+  @HttpCode(HttpStatus.OK)
+  async session(
+    @Req() { user }: { user: FortyTwoUserDto },
+    @Session() session: Record<string, any>,
+  ): Promise<FortyTwoUserDto> {
+    this.logger.debug(`### user session: ${JSON.stringify(session)}`);
+    return user;
   }
 
   // Debug route to check if user is authenticated
