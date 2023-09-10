@@ -1,12 +1,12 @@
 import { Link, NavigateFunction } from "react-router-dom";
 import { FormEvent, MutableRefObject, useEffect, useRef } from "react";
-import { AuthContextData, UserRegisterInfo } from "../../utils/interfaces/AuthContextData.ts";
+import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
 import { useAuth } from "../../utils/AuthContext.tsx";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const registerForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
-  const {user, registerUser} = useAuth() as AuthContextData;
+  const {user, register2FA} = useAuth() as AuthContextData;
   const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
@@ -22,26 +22,27 @@ const Register = () => {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const name: string = registerForm.current?.name.value;
-    const email: string = registerForm.current?.email.value;
-    const password1: string = registerForm.current?.password1.value;
-    const password2: string = registerForm.current?.password2.value;
+    // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // // @ts-ignore
+    // const name: string = registerForm.current?.name.value;
+    // const email: string = registerForm.current?.email.value;
+    // const password1: string = registerForm.current?.password1.value;
+    // const password2: string = registerForm.current?.password2.value;
+    //
+    // if (password1 !== password2) {
+    //   alert('Passwords do not match');
+    //   return;
+    // }
+    //
+    // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // const userRegisterInfo: UserRegisterInfo = {
+    //   name,
+    //   email,
+    //   password1,
+    //   password2
+    // }
 
-    if (password1 !== password2) {
-      alert('Passwords do not match');
-      return;
-    }
-
-    const userRegisterInfo: UserRegisterInfo = {
-      name,
-      email,
-      password1,
-      password2
-    }
-
-    registerUser(userRegisterInfo);
+    register2FA();
   }
 
   return (

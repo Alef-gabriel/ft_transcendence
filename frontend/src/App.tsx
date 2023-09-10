@@ -11,6 +11,10 @@ import { AuthProvider } from "../utils/AuthContext.tsx";
 
 function App() {
 
+  //Todo:
+  // Adicionar as rotas em um arquivo Routes.tsx
+  // Adicionar pagina de 404
+
   return (
     <Router>
         <AuthProvider>

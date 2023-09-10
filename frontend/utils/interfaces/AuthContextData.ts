@@ -1,10 +1,7 @@
-import { Models } from "appwrite";
-
 export interface AuthContextData {
-  user: Models.User<Models.Preferences> | null;
-  loginUser: (userInfo: UserInfo) => void;
+  user: boolean | null;
   logoutUser: () => void;
-  registerUser: (userInfo: UserRegisterInfo) => void;
+  register2FA: () => void;
 }
 
 export interface UserInfo {

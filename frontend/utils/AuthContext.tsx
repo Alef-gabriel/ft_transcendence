@@ -1,8 +1,6 @@
-import { useContext, useState, useEffect, createContext, ReactNode, FC } from "react";
-import { AuthContextData, UserInfo, UserRegisterInfo } from "./interfaces/AuthContextData.ts";
-import { account} from "../appwriteConfig.ts";
-import { Models } from "appwrite";
-import { ID } from "appwrite";
+import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
+import { AuthContextData } from "./interfaces/AuthContextData.ts";
+import axios from "axios";
 
 const AuthContext = createContext({});
 
@@ -13,56 +11,36 @@ interface AuthProviderProps {
 export const AuthProvider: FC<AuthProviderProps> = ({ children } ) => {
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser ] = useState<Models.User<Models.Preferences> | null>(null);
+  const [user, setUser ] = useState<boolean | null>(null);
 
   useEffect(() => {
     //const user = sessionStorage.getItem('user');
-    checkUserStatus();
+    validateUserSession();
   }, []);
 
-  const loginUser = async (userInfo: UserInfo) => {
-      setLoading(true);
-      try {
-        await account.createEmailSession(userInfo.email, userInfo.password);
-        const accountDetails: Models.User<Models.Preferences> = await account.get();
 
-        setUser(accountDetails);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-  }
-
-  const logoutUser = () => {
-    account.deleteSession('current');
-    setUser(null);
-  }
-
-  const registerUser = async (userRegisterInfo: UserRegisterInfo) => {
-    setLoading(true);
-
+  const logoutUser = async () => {
     try {
-      await account.create(
-        ID.unique(),
-        userRegisterInfo.email,
-        userRegisterInfo.password1,
-        userRegisterInfo.name);
-
-      await account.createEmailSession(userRegisterInfo.email, userRegisterInfo.password1);
-      const accountDetails: Models.User<Models.Preferences> = await account.get();
-
-      setUser(accountDetails);
+      await axios.get('http://localhost:3000/api/auth/logout',
+        { withCredentials: true });
+      setUser(false);
     } catch (error) {
       console.log(error);
     }
-
-    setLoading(false);
   }
 
-  const checkUserStatus = async () => {
+  const validateUserSession = async () => {
+    //Trocar para obter infomrações do usuário e setar no contexto
+
     try {
-      const accountDetails: Models.User<Models.Preferences> = await account.get();
-      setUser(accountDetails);
+      const statusResponse = await axios.get('http://localhost:3000/api/auth/status',
+        { withCredentials: true });
+
+      if (statusResponse.status === 200) {
+        console.log("User is logged in");
+        setUser(true);
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +48,15 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children } ) => {
     setLoading(false)
   }
 
-  const contextData: AuthContextData = { user, loginUser, logoutUser, registerUser }
+  const register2FA = async () => {
+    try {
+      await axios.post('http://localhost:3000/api/auth/register');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const contextData: AuthContextData = { user, logoutUser, register2FA }
 
   return (
     <AuthContext.Provider value={contextData}>
