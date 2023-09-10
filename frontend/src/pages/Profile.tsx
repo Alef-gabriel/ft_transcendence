@@ -49,7 +49,7 @@ const Profile = () => {
 
       <br></br>
 
-      <button className="btn" onClick={ user?.otpEnabled ? disable2FA : () => navigate("/register2fa")} >
+      <button className="btn" onClick={ user?.otpEnabled ? disable2FA : () => navigate("/register-2fa")} >
         { user?.otpEnabled ? "Disable Two Factor Authentication" : "Enable Two Factor Authentication"}
       </button>
 

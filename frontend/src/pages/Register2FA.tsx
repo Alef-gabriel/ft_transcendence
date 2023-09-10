@@ -2,6 +2,7 @@ import { FormEvent, MutableRefObject, useRef, useState } from "react";
 import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
 import { useAuth } from "../../utils/AuthContext.tsx";
 import axios from "axios";
+
 const Register2FA = () => {
   const registerForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
   const {user, enable2FA} = useAuth() as AuthContextData;
@@ -66,4 +67,4 @@ const Register2FA = () => {
   )
 }
 
-export default Register2FA
+export default Register2FA;

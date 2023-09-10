@@ -8,6 +8,8 @@ import Login from './pages/Login.js'
 import Register2FA from './pages/Register2FA.tsx'
 import PrivateRoutes from "../utils/PrivateRoutes.tsx";
 import { AuthProvider } from "../utils/AuthContext.tsx";
+import ValidateOTP from "./pages/ValidateOTP.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
 function App() {
 
@@ -24,12 +26,14 @@ function App() {
             <Route element={<PrivateRoutes/>}>
               <Route path="/" element={<Home/>}/>
               <Route path="/profile" element={<Profile/>}/>
-              <Route path="/register2fa" element={<Register2FA/>}/>
+              <Route path="/register-2fa" element={<Register2FA/>}/>
+              <Route path="/validate-otp" element={<ValidateOTP/>}/>
             </Route>
+            <Route path="*" element={<NotFound/>}/>
           </Routes>
         </AuthProvider>
     </Router>
   )
 }
 
-export default App
+export default App;

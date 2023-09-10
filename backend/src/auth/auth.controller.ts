@@ -45,11 +45,17 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/redirect')
   @HttpCode(HttpStatus.OK)
-  async redirect(@Res() res: Response): Promise<void> {
-    res.redirect(
+  async redirect(
+    @Req() { user }: { user: FortyTwoUserDto },
+    @Res() res: Response,
+  ): Promise<void> {
+    const redirectUrl: string =
       this.configService.get<string>('APP_OAUTH2_REDIRECT') ||
-        'http://localhost:5173',
-    );
+      'http://localhost:5173';
+
+    user.otpEnabled
+      ? res.redirect(redirectUrl + '/validate-otp')
+      : res.redirect(redirectUrl);
   }
 
   @Get('logout')

@@ -5,12 +5,5 @@ export interface AuthContextData {
   logoutUser: () => void;
   enable2FA: (code: string) => void;
   disable2FA: () => void;
-}
-
-
-export interface UserRegisterInfo {
-  name: string;
-  email: string;
-  password1: string;
-  password2: string;
+  validateOTP: (code: string) => void;
 }

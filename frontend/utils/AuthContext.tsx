@@ -64,7 +64,16 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const contextData: AuthContextData = { user, logoutUser, enable2FA, disable2FA };
+  const validateOTP = async (code: string) => {
+    try {
+      await axios.post("http://localhost:3000/api/auth/2fa/validate", { code }, { withCredentials: true });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const contextData: AuthContextData = { user, logoutUser, enable2FA, disable2FA, validateOTP };
 
   return (
     <AuthContext.Provider value={contextData}>
