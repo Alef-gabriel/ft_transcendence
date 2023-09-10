@@ -72,7 +72,8 @@ export class AuthService {
 
   async enable2FA(user: FortyTwoUser, otp: OneTimePassword): Promise<void> {
     if (user.otpEnabled) {
-      throw new BadRequestException('OTP already enabled');
+      this.logger.log(`### User [${user.id}] already enabled OTP`);
+      return;
     }
 
     if (!this.is2FACodeValid(otp.code, user.otpSecret!)) {
@@ -95,7 +96,8 @@ export class AuthService {
 
   async validateOTP(user: FortyTwoUser, otp: OneTimePassword): Promise<void> {
     if (user.otpValidated) {
-      return this.logger.log(`### User [${user.id}] already validated OTP`);
+      this.logger.log(`### User [${user.id}] already validated OTP`);
+      return;
     }
 
     if (!this.is2FACodeValid(otp.code, user.otpSecret!)) {

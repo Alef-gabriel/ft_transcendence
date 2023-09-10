@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import Header from "../components/Header.tsx";
+import { isAxiosError } from "axios";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -8,6 +9,7 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  errorCode: number | undefined;
 }
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -16,16 +18,26 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     this.state = {
       hasError: false,
       error: null,
+      errorCode: undefined,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ hasError: true, error });
+
+    if (isAxiosError(error)) {
+      this.setState({ hasError: true, error, errorCode: error.response?.status });
+    }
+
     console.error(error, errorInfo);
   }
 
   render(): ReactNode {
-    if (this.state.hasError) {
+    if (!this.state.hasError) {
+      return this.props.children;
+    }
+
+    if (this.state.hasError && (!this.state.errorCode)) {
       return (
         <>
           <Header></Header>
@@ -43,7 +55,57 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       );
     }
 
-    return this.props.children;
+    switch (this.state.errorCode) {
+      case 401:
+        return (
+          <>
+            <Header></Header>
+            <div className="container">
+              <div className="error-page-wrapper">
+                <h1>401 - Unauthorized</h1>
+                <p>You are not authorized to access this page.</p>
+                <br></br>
+                <div>
+                  <a href={"/"}>Go to Home Page</a>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      case 403:
+        return (
+          <>
+            <Header></Header>
+            <div className="container">
+              <div className="error-page-wrapper">
+                <h1>403 - Forbidden</h1>
+                <p>You are not authorized to access this page.</p>
+                <br></br>
+                <div>
+                  <a href={"/"}>Go to Home Page</a>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      default:
+        return (
+          <>
+            <Header></Header>
+            <div className="container">
+              <div className="error-page-wrapper">
+                <h1>Something went wrong</h1>
+                <p>We apologize for the inconvenience. Please try again later.</p>
+                <br></br>
+                <div>
+                  <a href={"/"}>Go to Home Page</a>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+    }
+
   }
 }
 

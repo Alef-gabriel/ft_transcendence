@@ -2,11 +2,12 @@ import { FormEvent, MutableRefObject, useRef, useState } from "react";
 import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
 import { useAuth } from "../../utils/AuthContext.tsx";
 import axios from "axios";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 const Register2FA = () => {
   const registerForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
   const {user, enable2FA} = useAuth() as AuthContextData;
-
+  const navigate: NavigateFunction = useNavigate();
   const [qrCode, setQRCode] = useState('');
 
 
@@ -32,6 +33,8 @@ const Register2FA = () => {
 
     console.log(`### Registering 2FA with code ${registerForm.current.code?.value}`);
     enable2FA(registerForm.current.code?.value);
+
+    navigate('/');
   }
 
   return (

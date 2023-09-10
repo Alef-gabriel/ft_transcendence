@@ -36,11 +36,12 @@ const ValidateOTP = () => {
   }
 
   return (
-    //!user?.otpEnabled
-    !user
+    !user?.otpEnabled
       ?
       <div className="container">
-        <h1>Two Factor Authentication is disabled</h1>
+        <div className="two-factor-register-title">
+          <h1>Two Factor Authentication is disabled</h1>
+        </div>
       </div>
       :
       <div className="container">
