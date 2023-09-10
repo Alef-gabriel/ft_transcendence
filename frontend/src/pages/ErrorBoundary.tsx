@@ -37,7 +37,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       return this.props.children;
     }
 
-    if (this.state.hasError && (!this.state.errorCode)) {
+    if (this.state.hasError && !this.state.errorCode) {
       return (
         <>
           <Header></Header>

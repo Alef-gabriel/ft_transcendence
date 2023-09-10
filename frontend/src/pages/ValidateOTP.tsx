@@ -64,7 +64,6 @@ const ValidateOTP = () => {
           </form>
         </div>
 
-
         {wrongOtp && <p className="warning-text">Invalid code, try again.</p>}
 
       </div>

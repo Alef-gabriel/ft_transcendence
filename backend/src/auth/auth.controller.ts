@@ -15,7 +15,7 @@ import {
   FortyTwoAuthGuard,
   Public,
   ResponseMessage,
-  TwoFactorAuthentication,
+  DisableTwoFactorAuthenticationBlock,
 } from './index';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
@@ -96,7 +96,7 @@ export class AuthController {
     return { message: 'Two-factor authentication disabled' };
   }
 
-  @TwoFactorAuthentication()
+  @DisableTwoFactorAuthenticationBlock()
   @Post('2fa/validate')
   async validate2FA(
     @Req() req: Request,
@@ -105,6 +105,17 @@ export class AuthController {
   ): Promise<any> {
     await this.authService.validateOTP(req.user as FortyTwoUserDto, otp);
     await this.authService.login2FAUser(req, res);
+  }
+
+  @DisableTwoFactorAuthenticationBlock()
+  @Get('2fa/session')
+  @HttpCode(HttpStatus.OK)
+  async session2fa(
+    @Req() { user }: { user: FortyTwoUserDto },
+    @Session() session: Record<string, any>,
+  ): Promise<FortyTwoUserDto> {
+    this.logger.debug(`### user session: ${JSON.stringify(session)}`);
+    return { ...user, otpSecret: undefined };
   }
 
   @Get('session')

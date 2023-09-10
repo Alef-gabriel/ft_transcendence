@@ -11,7 +11,6 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-//TODO: Verificar uma forma de validar um usuário com 2FA, a rota validate-otp toma 403 e é redirecionado para o login
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const navigate: NavigateFunction = useNavigate();
@@ -20,18 +19,35 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const throwAsyncError = useThrowAsyncError();
 
   useEffect(() => {
-    console.log("##### ",location.pathname)
+    if (location.pathname === "/validate-otp") {
+      console.log(`### Validating 2FA session for path: ${location.pathname}`)
+      validate2FASession();
+      return
+    }
 
+    console.log(`### Validating user session for path: ${location.pathname}`)
     validateUserSession();
   }, [navigate]);
 
+  const validate2FASession = async (): Promise<void> => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/auth/2fa/session",
+        { withCredentials: true });
+
+      setUser(response.data);
+    } catch (error) {
+      throwAsyncError(error);
+    }
+
+    setLoading(false)
+  }
 
   const validateUserSession = async (): Promise<void> => {
     try {
-        const statusResponse = await axios.get("http://localhost:3000/api/auth/session",
+        const response = await axios.get("http://localhost:3000/api/auth/session",
           { withCredentials: true });
       console.log("### User session validated");
-      setUser(statusResponse.data);
+      setUser(response.data);
     } catch (error) {
       console.log(error);
       setUser(null);
@@ -47,17 +63,23 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         { withCredentials: true });
       setUser(null);
     } catch (error) {
-      console.log(error);
       throwAsyncError(error);
     }
   };
 
-  const enable2FA = async (code: string): Promise<void> => {
+  const enable2FA = async (code: string): Promise<boolean> => {
     try {
       await axios.post("http://localhost:3000/api/auth/2fa/turn-on", { code }, { withCredentials: true });
     } catch (error) {
       console.log(error);
+
+      if (axios.isAxiosError(error) && error.response?.status !== 401) {
+        throwAsyncError(error);
+      }
+
+      return false;
     }
+    return true;
   };
 
   const disable2FA = async (): Promise<void> => {
@@ -65,7 +87,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       await axios.post("http://localhost:3000/api/auth/2fa/turn-off", {}, { withCredentials: true });
       validateUserSession();
     } catch (error) {
-      console.log(error);
+      throwAsyncError(error);
     }
   };
 
@@ -76,8 +98,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       console.log(error);
 
       if (axios.isAxiosError(error) && error.response?.status !== 401) {
-        console.error("### Server Error");
-        throw error;
+        throwAsyncError(error);
       }
 
       return false;
