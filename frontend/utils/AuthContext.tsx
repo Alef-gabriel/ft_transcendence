@@ -25,9 +25,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const statusResponse = await axios.get("http://localhost:3000/api/auth/session",
         { withCredentials: true });
 
-        console.log("### User session validated");
-        setUser(statusResponse.data);
-
+      console.log("### User session validated");
+      setUser(statusResponse.data);
     } catch (error) {
       console.log(error);
       setUser(null)
@@ -36,7 +35,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
     setLoading(false);
   };
-
 
   const logoutUser = async () => {
     try {

@@ -9,7 +9,7 @@ const Profile = () => {
 
   const [profile, setProfile] = useState<Profile | undefined>(undefined);
 
-
+  //TODO: Criar um Context para o Profile, no futuro diversos componentes usarão esses dados
   const fetchData = useCallback(async () => {
       const response = await axios.get("http://localhost:3000/api/profile",
         { withCredentials: true });
@@ -29,20 +29,23 @@ const Profile = () => {
       <br></br>
 
       <p>Avatar: {profile?.avatar}</p>
-      <p>
-        <button>Change Avatar</button>
-      </p>
-
-      <br></br>
       <p>Nickname: {profile?.nickname}</p>
+
+      <br></br>
+
       <p>
-        <button>Change Nickname</button>
+        <button className="btn">Change Avatar</button>
+      </p>
+
+      <br></br>
+      <p>
+        <button className="btn">Change Nickname</button>
       </p>
 
       <br></br>
 
       <p>
-        <button>
+        <button className="btn">
           { user?.otpEnabled ? "Enable Two Factor Authentication" : "Disable Two Factor Authentication"}
         </button>
       </p>
@@ -50,7 +53,7 @@ const Profile = () => {
       <br></br>
 
       <p>
-        <button>Delete Account</button>
+        <button className="btn">Delete Account</button>
       </p>
     </div>
   );

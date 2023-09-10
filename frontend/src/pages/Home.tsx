@@ -1,14 +1,17 @@
-
 const Home = () => {
   return (
-  
-        <div className="container">
-            <h1>Welcome PONG</h1>
 
-            <p></p>
-        </div>
+    <div className="container">
+      <h1>Welcome PONG</h1>
 
-  )
-}
+      <br></br>
 
-export default Home
+      <p>Ranking: C</p>
+      <p>Wins: 17</p>
+      <p>Losses: 9</p>
+    </div>
+
+  );
+};
+
+export default Home;
