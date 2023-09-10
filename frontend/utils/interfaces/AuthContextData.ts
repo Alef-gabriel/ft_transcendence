@@ -5,5 +5,5 @@ export interface AuthContextData {
   logoutUser: () => void;
   enable2FA: (code: string) => void;
   disable2FA: () => void;
-  validateOTP: (code: string) => void;
+  validateOTP: (code: string) => Promise<boolean>;
 }

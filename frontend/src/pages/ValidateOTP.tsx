@@ -1,20 +1,38 @@
-import { FormEvent, MutableRefObject, useRef } from "react";
+import { FormEvent, MutableRefObject, useRef, useState } from "react";
 import { useAuth } from "../../utils/AuthContext.tsx";
 import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
+import { NavigateFunction, useNavigate } from "react-router-dom";
+import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
 
 const ValidateOTP = () => {
   const registerForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
   const {user, validateOTP} = useAuth() as AuthContextData;
+  const [wrongOtp, setWrongOtp] = useState<boolean>(false);
+  const navigate: NavigateFunction = useNavigate();
+  const throwAsyncError = useThrowAsyncError();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     if (!registerForm.current) {
       return;
     }
 
-    console.log(`### Registering 2FA with code ${registerForm.current.code?.value}`);
-    validateOTP(registerForm.current.code?.value);
+    console.log(`### Validating 2FA with code ${registerForm.current.code?.value}`);
+
+    try {
+      const isOtpValid: boolean = await validateOTP(registerForm.current.code?.value);
+
+      if (!isOtpValid) {
+        setWrongOtp(true);
+        return;
+      }
+
+      navigate('/');
+    } catch (error) {
+      throwAsyncError(error);
+    }
   }
 
   return (
@@ -38,13 +56,16 @@ const ValidateOTP = () => {
             <div className="form-field-wrapper">
               <input type="code" name="code" placeholder="Enter the code" />
             </div>
-
             <div className="form-field-wrapper">
-              <input type="submit" value="Register" className="btn" />
+              <input type="submit" value="Validate" className="btn" />
             </div>
 
           </form>
         </div>
+
+
+        {wrongOtp && <p className="warning-text">Invalid code, try again.</p>}
+
       </div>
   )
 }

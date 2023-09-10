@@ -8,7 +8,7 @@ const Header = () => {
   return (
     <div className="header">
       <div>
-        <Link id="header-logo" to="/">Pong</Link>
+        <a href={"/"} id="header-logo">Pong</a>
       </div>
 
       <div className="links--wrapper">

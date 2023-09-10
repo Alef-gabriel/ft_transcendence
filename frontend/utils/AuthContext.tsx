@@ -20,7 +20,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     validateUserSession();
   }, [navigate]);
 
-  const validateUserSession = async () => {
+  const validateUserSession = async (): Promise<void> => {
     try {
       const statusResponse = await axios.get("http://localhost:3000/api/auth/session",
         { withCredentials: true });
@@ -36,7 +36,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   };
 
-  const logoutUser = async () => {
+  const logoutUser = async (): Promise<void> => {
     try {
       await axios.get("http://localhost:3000/api/auth/logout",
         { withCredentials: true });
@@ -48,7 +48,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   };
 
-  const enable2FA = async (code: string) => {
+  const enable2FA = async (code: string): Promise<void> => {
     try {
       await axios.post("http://localhost:3000/api/auth/2fa/turn-on", { code }, { withCredentials: true });
     } catch (error) {
@@ -56,7 +56,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const disable2FA = async () => {
+  const disable2FA = async (): Promise<void> => {
     try {
       await axios.post("http://localhost:3000/api/auth/2fa/turn-off");
     } catch (error) {
@@ -64,12 +64,20 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const validateOTP = async (code: string) => {
+  const validateOTP = async (code: string): Promise<boolean> => {
     try {
       await axios.post("http://localhost:3000/api/auth/2fa/validate", { code }, { withCredentials: true });
     } catch (error) {
       console.log(error);
+
+      if (axios.isAxiosError(error) && error.response?.status !== 401) {
+        console.error("### Internal Server Error");
+        throw error;
+      }
+
+      return false;
     }
+    return true;
   };
 
 

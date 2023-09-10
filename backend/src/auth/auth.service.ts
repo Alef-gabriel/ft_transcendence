@@ -95,7 +95,7 @@ export class AuthService {
 
   async validateOTP(user: FortyTwoUser, otp: OneTimePassword): Promise<void> {
     if (user.otpValidated) {
-      throw new BadRequestException('OTP already validated');
+      return this.logger.log(`### User [${user.id}] already validated OTP`);
     }
 
     if (!this.is2FACodeValid(otp.code, user.otpSecret!)) {

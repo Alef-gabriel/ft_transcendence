@@ -10,6 +10,7 @@ import PrivateRoutes from "../utils/PrivateRoutes.tsx";
 import { AuthProvider } from "../utils/AuthContext.tsx";
 import ValidateOTP from "./pages/ValidateOTP.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ErrorBoundary from "./pages/ErrorBoundary.tsx";
 
 function App() {
 
@@ -19,19 +20,21 @@ function App() {
 
   return (
     <Router>
-        <AuthProvider>
-          <Header/>
-          <Routes>
-            <Route path="/login" element={<Login/>}/>
-            <Route element={<PrivateRoutes/>}>
-              <Route path="/" element={<Home/>}/>
-              <Route path="/profile" element={<Profile/>}/>
-              <Route path="/register-2fa" element={<Register2FA/>}/>
-              <Route path="/validate-otp" element={<ValidateOTP/>}/>
-            </Route>
-            <Route path="*" element={<NotFound/>}/>
-          </Routes>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <Header/>
+            <Routes>
+              <Route path="/login" element={<Login/>}/>
+              <Route element={<PrivateRoutes/>}>
+                <Route path="/" element={<Home/>}/>
+                <Route path="/profile" element={<Profile/>}/>
+                <Route path="/register-2fa" element={<Register2FA/>}/>
+                <Route path="/validate-otp" element={<ValidateOTP/>}/>
+              </Route>
+              <Route path="*" element={<NotFound/>}/>
+            </Routes>
+          </AuthProvider>
+        </ErrorBoundary>
     </Router>
   )
 }
