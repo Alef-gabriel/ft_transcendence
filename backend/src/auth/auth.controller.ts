@@ -21,10 +21,14 @@ import { Request, Response } from 'express';
 import { FortyTwoUserDto } from './models/forty-two-user.dto';
 import { OneTimePasswordDto } from './models/one-time-password.dto';
 import { ResponseMessageDto } from './models/response-message.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Public()
   @UseGuards(FortyTwoAuthGuard)
@@ -39,7 +43,10 @@ export class AuthController {
   @Get('42/redirect')
   @HttpCode(HttpStatus.OK)
   async redirect(@Res() res: Response): Promise<void> {
-    res.redirect('http://localhost:5173');
+    res.redirect(
+      this.configService.get<string>('APP_OAUTH2_REDIRECT') ||
+        'http://localhost:5173',
+    );
   }
 
   @Get('logout')

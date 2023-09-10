@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
 import { useAuth } from "../../utils/AuthContext.tsx";
 
+
+//TODO: Receber a rota de login por configuração
 const Login = () => {
   const navigate: NavigateFunction = useNavigate();
   const { user } = useAuth() as AuthContextData;
@@ -19,7 +21,7 @@ const Login = () => {
         <div className="login-register-container">
 
           <div className="login-logo-wrapper">
-            <img src= "../../public/logo/fortytwo.png" alt="Your Image" />
+            <img src= "/logo/fortytwo.png" alt="Your Image" />
           </div>
 
           <a href="http://localhost:3000/api/auth/42/login" className="btn">
