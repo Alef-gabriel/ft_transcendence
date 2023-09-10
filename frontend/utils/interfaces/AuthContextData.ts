@@ -1,16 +1,11 @@
 import { FortyTwoUser } from "../../../backend/src/auth";
 
 export interface AuthContextData {
-  //user: FortyTwoUser | null;
-  user: boolean
+  user: FortyTwoUser | null;
   logoutUser: () => void;
   register2FA: () => void;
 }
 
-export interface UserInfo {
-  email: string;
-  password: string;
-}
 
 export interface UserRegisterInfo {
   name: string;

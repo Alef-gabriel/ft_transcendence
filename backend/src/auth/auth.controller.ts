@@ -111,7 +111,7 @@ export class AuthController {
     @Session() session: Record<string, any>,
   ): Promise<FortyTwoUserDto> {
     this.logger.debug(`### user session: ${JSON.stringify(session)}`);
-    return user;
+    return { ...user, otpSecret: undefined };
   }
 
   // Debug route to check if user is authenticated
