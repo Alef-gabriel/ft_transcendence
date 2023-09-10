@@ -3,9 +3,12 @@ import axios from "axios";
 import { Profile } from "../../../backend/src/profile/interfaces/profile.interface.ts";
 import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
 import { useAuth } from "../../utils/AuthContext.tsx";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const { user} = useAuth() as AuthContextData;
+  const navigate: NavigateFunction = useNavigate();
+
+  const { user, disable2FA } = useAuth() as AuthContextData;
 
   const [profile, setProfile] = useState<Profile | undefined>(undefined);
 
@@ -22,6 +25,7 @@ const Profile = () => {
       .catch((error) => console.log(error));
   }, [fetchData]);
 
+
   return (
     <div className="container">
       <h1>User Profile</h1>
@@ -29,32 +33,30 @@ const Profile = () => {
       <br></br>
 
       <p>Avatar: {profile?.avatar}</p>
+
+      <br></br>
+
       <p>Nickname: {profile?.nickname}</p>
 
       <br></br>
 
-      <p>
-        <button className="btn">Change Avatar</button>
-      </p>
-
-      <br></br>
-      <p>
-        <button className="btn">Change Nickname</button>
-      </p>
+      <button className="btn">Change Avatar</button>
 
       <br></br>
 
-      <p>
-        <button className="btn">
-          { user?.otpEnabled ? "Enable Two Factor Authentication" : "Disable Two Factor Authentication"}
-        </button>
-      </p>
+      <button className="btn">Change Nickname</button>
+
 
       <br></br>
 
-      <p>
-        <button className="btn">Delete Account</button>
-      </p>
+      <button className="btn" onClick={ user?.otpEnabled ? disable2FA : () => navigate("/register2fa")} >
+        { user?.otpEnabled ? "Disable Two Factor Authentication" : "Enable Two Factor Authentication"}
+      </button>
+
+      <br></br>
+
+      <button className="btn">Delete Account</button>
+
     </div>
   );
 };

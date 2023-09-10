@@ -48,15 +48,23 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   };
 
-  const register2FA = async () => {
+  const enable2FA = async (code: string) => {
     try {
-      await axios.post("http://localhost:3000/api/auth/register");
+      await axios.post("http://localhost:3000/api/auth/2fa/turn-on", { code }, { withCredentials: true });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const contextData: AuthContextData = { user, logoutUser, register2FA };
+  const disable2FA = async () => {
+    try {
+      await axios.post("http://localhost:3000/api/auth/2fa/turn-off");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const contextData: AuthContextData = { user, logoutUser, enable2FA, disable2FA };
 
   return (
     <AuthContext.Provider value={contextData}>

@@ -3,7 +3,8 @@ import { FortyTwoUser } from "../../../backend/src/auth";
 export interface AuthContextData {
   user: FortyTwoUser | null;
   logoutUser: () => void;
-  register2FA: () => void;
+  enable2FA: (code: string) => void;
+  disable2FA: () => void;
 }
 
 

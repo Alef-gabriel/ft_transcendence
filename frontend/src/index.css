@@ -81,6 +81,11 @@
 
 /* FORM STYLING */
 
+.two-factor-register-container{
+    max-width: 200px;
+    margin:0 auto;
+}
+
 .login-register-container{
     max-width: 200px;
     margin:0 auto;
