@@ -25,13 +25,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const statusResponse = await axios.get("http://localhost:3000/api/auth/session",
         { withCredentials: true });
 
-      if (statusResponse.status === 200) {
-        console.log("### User session validated")
+        console.log("### User session validated");
         setUser(statusResponse.data);
-      }
 
     } catch (error) {
       console.log(error);
+      setUser(null)
+      navigate('/login');
     }
 
     setLoading(false);
