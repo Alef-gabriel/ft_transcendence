@@ -11,6 +11,7 @@ import { AuthProvider } from "../utils/AuthContext.tsx";
 import ValidateOTP from "./pages/ValidateOTP.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ErrorBoundary from "./pages/ErrorBoundary.tsx";
+import Welcome from "./pages/Welcome.tsx";
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
               <Route path="/login" element={<Login/>}/>
               <Route element={<PrivateRoutes/>}>
                 <Route path="/" element={<Home/>}/>
+                <Route path="/welcome" element={<Welcome/>}/>
                 <Route path="/profile" element={<Profile/>}/>
                 <Route path="/register-2fa" element={<Register2FA/>}/>
                 <Route path="/validate-otp" element={<ValidateOTP/>}/>

@@ -72,17 +72,53 @@
     font-family: 'Orbitron', sans-serif;
 }
 
+.btn-small{
+    display: block;
+    cursor: pointer;
+    background-color: #000;
+    color: #fff;
+    padding: 0.5em 1em;
+    transition: 0.3s;
+    border:1px solid #000;
+    text-decoration: none;
+    line-height: normal;
+    font-weight: 400;
+    font-family: 'Orbitron', sans-serif;
+    max-width: 200px;
+    text-align: center;
+}
 
 .btn:hover{
     background-color: #fff;
     color: #000;
 }
 
-
-/* FORM STYLING */
-
 .two-factor-register-container{
     max-width: 200px;
+    margin:0 auto;
+}
+
+.form-field-btn-wrapper {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.btn-small {
+    display: block;
+    margin: 1em auto;
+}
+
+.welcome-title {
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.welcome-form-wrapper{
+    max-width: 400px;
     margin:0 auto;
 }
 
@@ -102,6 +138,12 @@
     margin-top: 1em;
     margin-bottom: 1em;
     border: black 1px solid;
+}
+
+.welcome-title {
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 .error-page-wrapper {
@@ -129,6 +171,7 @@ input{
 .form-field-wrapper{
     margin: 1em 0;
 }
+
 
 @media(max-width:800px) {
     #header-logo{

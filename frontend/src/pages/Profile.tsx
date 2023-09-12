@@ -12,7 +12,7 @@ const Profile = () => {
 
   const [profile, setProfile] = useState<Profile | undefined>(undefined);
 
-  //TODO: Criar um Context para o Profile, no futuro diversos componentes usarão esses dados
+  //TODO: Criar um Context para o Profile, no futuro diversos componentes usarão esses dados. Exibir as informações do Profile.
   const fetchData = useCallback(async () => {
       const response = await axios.get("http://localhost:3000/api/profile",
         { withCredentials: true });
