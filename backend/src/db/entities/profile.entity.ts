@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { Profile } from '../../profile/interfaces/profile.interface';
+import { AvatarEntity } from './avatar.entity';
 
 @Entity({ name: 'profiles' })
 export class ProfileEntity implements Profile {
@@ -18,6 +19,15 @@ export class ProfileEntity implements Profile {
 
   @Column()
   avatar: string;
+
+  @JoinColumn({ name: 'avatarId' })
+  @OneToOne(() => AvatarEntity, {
+    nullable: true,
+  })
+  public avatar?: AvatarEntity;
+
+  @Column({ nullable: true })
+  public avatarId?: number;
 
   @OneToOne(() => UserEntity, {
     eager: true,
