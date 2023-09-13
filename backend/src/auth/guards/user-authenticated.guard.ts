@@ -7,7 +7,7 @@ import {
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
 import { IS_TWO_FACTOR_AUTH } from '../decorators/two-factor-auth.decorator';
-import { FortyTwoUser } from '../interfaces/fortytwo-user.interface';
+import { FortyTwoUser } from '../../user/interfaces/fortytwo-user.interface';
 
 // This class is used to check if user is authenticated, all non-public routes should use this guard
 @Injectable()

@@ -1,6 +1,12 @@
+import { AvatarEntity, UserEntity } from '../../db/entities';
+
 export interface Profile {
+  id: number;
   nickname: string;
-  avatar: string; //Temporário
-  avatarId: string;
-  avatarImage: string;
+  wins?: number;
+  losses?: number;
+  draws?: number;
+  avatarId?: number;
+  avatar?: AvatarEntity;
+  userEntity: UserEntity;
 }

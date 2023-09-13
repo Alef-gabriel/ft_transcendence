@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { ProfileEntity, UserEntity } from '../db/entities';
+import { AvatarEntity, ProfileEntity, UserEntity } from '../db/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   DeleteResult,
@@ -16,19 +16,20 @@ import {
 import { Profile } from './interfaces/profile.interface';
 import { ProfileDeletedResponseDto } from './models/profile-delete-response.dto';
 import { ProfileUpdatedResponseDto } from './models/profile-updated-response.dto';
-import { ProfileDto } from './models/profile.dto';
+import { AvatarService } from '../avatar/avatar.service';
 
 @Injectable()
 export class ProfileService {
-  private readonly logger = new Logger(ProfileService.name);
+  private readonly logger: Logger = new Logger(ProfileService.name);
 
   constructor(
     private readonly userService: UserService,
+    private readonly avatarService: AvatarService,
     @InjectRepository(ProfileEntity)
     private readonly profileRepository: Repository<ProfileEntity>,
   ) {}
 
-  async findById(id: number): Promise<ProfileDto> {
+  async findById(id: number): Promise<any> {
     const profileEntity: ProfileEntity | null =
       await this.profileRepository.findOneBy({
         userEntity: { id },
@@ -39,13 +40,26 @@ export class ProfileService {
     }
 
     this.logger.log(`Profile found for user [${id}]`);
-    return {
-      nickname: profileEntity.nickname,
-      avatar: profileEntity.avatar,
-    };
+    return profileEntity;
   }
 
-  async save(id: number, profile: Profile): Promise<Profile> {
+  async addAvatar(
+    userId: number,
+    imageBuffer: Buffer,
+    filename: string,
+  ): Promise<AvatarEntity> {
+    const avatar: AvatarEntity = await this.avatarService.upload(
+      imageBuffer,
+      filename,
+    );
+
+    await this.profileRepository.update(userId, {
+      avatarId: avatar.id,
+    });
+    return avatar;
+  }
+
+  async create(id: number, nickname: string): Promise<Profile> {
     const userEntity: UserEntity | null = await this.userService.findById(id);
 
     if (!userEntity) {
@@ -53,8 +67,7 @@ export class ProfileService {
     }
 
     const profileEntity: ProfileEntity = new ProfileEntity();
-    profileEntity.nickname = profile.nickname;
-    profileEntity.avatar = profile.avatar;
+    profileEntity.nickname = nickname;
     profileEntity.userEntity = userEntity;
 
     let savedEntity: ProfileEntity;
@@ -69,10 +82,7 @@ export class ProfileService {
     }
 
     this.logger.log(`Profile created for user [${id}]`);
-    return {
-      nickname: savedEntity.nickname,
-      avatar: savedEntity.avatar,
-    };
+    return savedEntity;
   }
 
   async update(

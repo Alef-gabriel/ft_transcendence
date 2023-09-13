@@ -5,7 +5,7 @@ import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger(UserService.name);
+  private readonly logger: Logger = new Logger(UserService.name);
 
   constructor(
     @InjectRepository(UserEntity)

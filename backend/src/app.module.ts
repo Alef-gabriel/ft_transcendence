@@ -7,11 +7,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserAuthenticatedGuard } from './auth';
 import { UserModule } from './user/user.module';
 import { ProfileModule } from './profile/profile.module';
+import AvatarModule from './avatar/avatar.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    AvatarModule,
     ProfileModule,
     ConfigModule.forRoot({
       isGlobal: true,

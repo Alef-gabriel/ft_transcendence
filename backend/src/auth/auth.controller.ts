@@ -19,7 +19,7 @@ import {
 } from './index';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
-import { FortyTwoUserDto } from './models/forty-two-user.dto';
+import { FortyTwoUserDto } from '../user/models/forty-two-user.dto';
 import { OneTimePasswordDto } from './models/one-time-password.dto';
 import { ResponseMessageDto } from './models/response-message.dto';
 import { ConfigService } from '@nestjs/config';
