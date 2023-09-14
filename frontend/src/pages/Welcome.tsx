@@ -2,7 +2,7 @@
 // se o profile existir, redirecionar para a home
 // se não existir, redirecionar exibir esse componente
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
 import { useProfile } from "../../utils/ProfileContext.tsx";
 import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
@@ -17,23 +17,24 @@ const Welcome = () => {
   const welcomeForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
   const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
   const throwAsyncError = useThrowAsyncError();
-  const { profile } = useProfile() as ProfileContextData;
+  const { profile, createProfile, uploadImage } = useProfile() as ProfileContextData;
   const navigate: NavigateFunction = useNavigate();
+  const [nicknameSaved, setNicknameSaved] = useState<boolean>(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<File | undefined>(undefined);
+  const [avatarSaved, setAvatarSaved] = useState<boolean>(false);
 
-  //const profileCreated = false; //Após enviar o avatar
-  //const nicknameSaved = false; //após salvar o nickname e criar o profile
 
   //verificar porque nao ta funcionando
   useEffect(() => {
-    if (profile) {
+    if (profile && avatarSaved) {
       console.log(`### Profile already exists, redirecting to home`);
       navigate("/");
       return;
     }
     console.log(`### Profile doesn't exist, rendering welcome page`);
-  }, [navigate, profile]);
+  }, [avatarSaved, navigate, profile]);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleNicknameSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     if (!welcomeForm.current) {
@@ -41,53 +42,99 @@ const Welcome = () => {
     }
 
     const nickname: string | undefined = welcomeForm.current.nickname?.value;
-    const avatar: string | undefined = welcomeForm.current.avatar?.value;
 
     try {
-      console.log(`### Creating profile with nickname: ${nickname} and avatar: ${avatar}`);
-      //validações
+      console.log(`### Creating profile with nickname: ${nickname}`);
       if (!nickname || nickname?.length < 4) {
         setInvalidProfile(true);
         return;
       }
 
-      //Criar contexto de profile chamar API para salver no DB
+      await createProfile(nickname);
 
-      navigate('/');
+      setNicknameSaved(true);
     } catch (error) {
       throwAsyncError(error);
     }
   }
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelectedAvatar(event.target.files?.[0]);
+  };
 
-  return (
-    <>
-      <div className="container">
-        <h1 className="welcome-title">Welcome to Pong!</h1>
-      </div>
+  const handleAvatarSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
 
-        <div className="welcome-form-wrapper">
-          <form ref={welcomeForm} onSubmit={handleSubmit}>
+    if (!selectedAvatar) {
+      alert('Please select an image to upload.');
+      return;
+    }
 
-            <div className="form-field-wrapper">
-              <label>Enter your nickname</label>
-              <input type="text" name="nickname" placeholder="nickname" required/>
+    const formData: FormData = new FormData();
+    formData.append('avatar', selectedAvatar);
+
+    try {
+
+      await uploadImage(formData);
+      setAvatarSaved(true);
+
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throwAsyncError(error);
+    }
+  }
+
+  return !nicknameSaved && !profile ? (
+        <>
+          <div className="container">
+            <h1 className="welcome-title">Welcome to Pong!</h1>
+          </div>
+
+            <div className="welcome-form-wrapper">
+              <form ref={welcomeForm} onSubmit={handleNicknameSubmit}>
+
+                <div className="form-field-wrapper">
+                  <label>Enter your nickname</label>
+                  <input type="text" name="nickname" placeholder="nickname" required/>
+                </div>
+
+                <div className="form-field-btn-wrapper">
+                  <input type="submit" value="Create Profile" className="btn-small" />
+                </div>
+
+              </form>
             </div>
 
-            <div className="form-field-wrapper">
-              <label>Enter your avatar</label>
-              <input type="text" name="avatar" placeholder="avatar" />
+            {invalidProfile && <p className="warning-text">Username must have at least 4 characters, try again</p>}
+        </>
+       ) : (
+        <>
+          <div className="container">
+            <div className="avatar-register-container">
+
+              <div className="avatar-image-wrapper">
+                { selectedAvatar
+                  ? <img src= {URL.createObjectURL(selectedAvatar)} alt="Avatar Image" className="avatar-image" />
+                  : <img src= "/default-avatar.jpeg" alt="Default Avatar Image" className="avatar-image" />
+                }
+              </div>
             </div>
+          </div>
 
-            <div className="form-field-btn-wrapper">
-              <input type="submit" value="Create Profile" className="btn-small" />
-            </div>
+          <div className="welcome-form-wrapper">
 
-          </form>
-        </div>
+              <div className="form-field-wrapper">
+                <label>Upload an avatar and/or continue</label>
+              </div>
 
-        {invalidProfile && <p className="warning-text">Username must have at least 4 characters, try again</p>}
-    </>
-  );
+              <div  className="form-field-wrapper">
+                <form onSubmit={handleAvatarSubmit}>
+                  <input type="file" accept="image/*" className="" onChange={handleImageUpload} />
+                  <button type="submit" className="btn-small">Continue</button>
+                </form>
+              </div>
+          </div>
+        </>
+       );
 };
 
 export default Welcome;

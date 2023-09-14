@@ -7,7 +7,7 @@ import AuthContext from "./AuthContext";
 
 const ProfileContext = createContext({});
 
-ProfileContext.displayName = 'ProfileContext';
+ProfileContext.displayName = "ProfileContext";
 
 interface ProfileProvideProps {
   children: ReactNode;
@@ -29,14 +29,44 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       console.log(`### Profile context updated: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
     } catch (error) {
-      console.log(`### Profile context update failed: ${error}`)
+      console.log(`### Profile context update failed: ${error}`);
       if (isAxiosError(error) && error.response?.status !== 404) {
         throwAsyncError(error);
       }
     }
   };
 
-  const contextData: ProfileContextData = { profile, updateProfileContext };
+  const createProfile = async (nickname: string): Promise<void> => {
+    try {
+      const response = await axios.post("http://localhost:3000/api/profile/create",
+        { nickname }, { withCredentials: true });
+
+      console.log(`### Profile created: ${JSON.stringify(response.data)}`);
+      setProfile(response.data);
+    } catch (error) {
+      console.log(`### Profile creation failed: ${error}`);
+      throwAsyncError(error);
+    }
+  };
+
+  const uploadImage = async (formData: FormData): Promise<void> => {
+    try {
+      const response = await axios.post("http://localhost:3000/api/profile/avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        },
+        withCredentials: true
+      });
+
+      console.log(`### Avatar uploaded: ${JSON.stringify(response.data)}`);
+      setProfile(response.data);
+    } catch (error) {
+      console.log(`### Avatar upload failed: ${error}`);
+      throwAsyncError(error);
+    }
+  };
+
+  const contextData: ProfileContextData = { profile, updateProfileContext, createProfile, uploadImage };
 
   return (
     <ProfileContext.Provider value={contextData}>

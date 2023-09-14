@@ -2,7 +2,7 @@ const Home = () => {
   return (
 
     <div className="container">
-      <h1>Welcome to PONG!</h1>
+      <h1>Player Dashboard</h1>
 
       <br></br>
 

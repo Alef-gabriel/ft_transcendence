@@ -20,7 +20,7 @@ const Login = () => {
         <div className="login-register-container">
 
           <div className="login-logo-wrapper">
-            <img src= "/logo/fortytwo.png" alt="Your Image" />
+            <img src= "/fortytwo.png" alt="Your Image" />
           </div>
 
           <a href="http://localhost:3000/api/auth/42/login" className="btn">
