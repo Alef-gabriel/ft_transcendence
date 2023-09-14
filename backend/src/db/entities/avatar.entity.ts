@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import Avatar from '../../avatar/interfaces/avatar.interface';
 
-@Entity()
+@Entity({ name: 'avatars' })
 export class AvatarEntity implements Avatar {
   @PrimaryGeneratedColumn()
   public id: number;
