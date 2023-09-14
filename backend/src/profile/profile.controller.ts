@@ -3,10 +3,13 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   ParseIntPipe,
   Post,
   Put,
@@ -77,7 +80,19 @@ export class ProfileController {
   @UseInterceptors(ClassSerializerInterceptor, FileInterceptor('avatar'))
   async uploadAvatar(
     @Req() @Req() { user }: { user: FortyTwoUserDto },
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 1024 * 1024 * 2,
+          }),
+          new FileTypeValidator({
+            fileType: '(png|jpeg|jpg|gif|svg|bmp|webp|tiff)',
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ): Promise<AvatarDTO> {
     return this.profileService.addAvatar(
       user.id,
