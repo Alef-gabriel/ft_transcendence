@@ -4,6 +4,8 @@
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
+import { useProfile } from "../../utils/ProfileContext.tsx";
+import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
 
 //TODO: Trocar o avatar por uma imagem
 //Fazer o componente dinâmica
@@ -15,15 +17,21 @@ const Welcome = () => {
   const welcomeForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
   const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
   const throwAsyncError = useThrowAsyncError();
+  const { profile } = useProfile() as ProfileContextData;
   const navigate: NavigateFunction = useNavigate();
 
-  const profile = false; //Criar contexto de profile chamar API para salver no DB
+  //const profileCreated = false; //Após enviar o avatar
+  //const nicknameSaved = false; //após salvar o nickname e criar o profile
 
+  //verificar porque nao ta funcionando
   useEffect(() => {
     if (profile) {
+      console.log(`### Profile already exists, redirecting to home`);
       navigate("/");
+      return;
     }
-  }, []);
+    console.log(`### Profile doesn't exist, rendering welcome page`);
+  }, [navigate, profile]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
