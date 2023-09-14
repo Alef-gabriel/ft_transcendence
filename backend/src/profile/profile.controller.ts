@@ -18,7 +18,6 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { FortyTwoUser } from '../auth';
-import { FortyTwoUserDto } from '../user/models/forty-two-user.dto';
 import { ProfileDTO } from './models/profile.dto';
 import { ProfileUpdatedResponseDto } from './models/profile-updated-response.dto';
 import { ProfileDeletedResponseDto } from './models/profile-delete-response.dto';
@@ -26,8 +25,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AvatarDTO } from '../avatar/models/avatar.dto';
 import { Readable } from 'stream';
 import { AvatarService } from '../avatar/avatar.service';
-import { response, Response } from 'express';
+import { Response } from 'express';
 import { AvatarEntity } from '../db/entities';
+import { FortyTwoUserDto } from '../user/models/forty-two-user.dto';
 
 @Controller('profile')
 export class ProfileController {

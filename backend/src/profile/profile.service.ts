@@ -1,12 +1,8 @@
 import {
   BadRequestException,
-  Get,
   Injectable,
   Logger,
   NotFoundException,
-  Param,
-  ParseIntPipe,
-  Res,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { ProfileEntity, UserEntity } from '../db/entities';
@@ -24,7 +20,6 @@ import { AvatarService } from '../avatar/avatar.service';
 import { plainToClass } from 'class-transformer';
 import { ProfileDTO } from './models/profile.dto';
 import { AvatarDTO } from '../avatar/models/avatar.dto';
-import { Readable } from 'stream';
 
 @Injectable()
 export class ProfileService {

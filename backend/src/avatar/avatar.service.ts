@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AvatarEntity } from '../db/entities';
 import { AvatarDTO } from './models/avatar.dto';
-import { instanceToPlain, plainToClass } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class AvatarService {

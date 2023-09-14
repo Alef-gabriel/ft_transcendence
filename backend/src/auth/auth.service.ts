@@ -17,7 +17,7 @@ import { FortyTwoUserDto } from '../user/models/forty-two-user.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
+  private readonly logger: Logger = new Logger(AuthService.name);
 
   constructor(
     private readonly userService: UserService,
