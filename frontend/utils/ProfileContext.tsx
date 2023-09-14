@@ -29,6 +29,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       console.log(`### Profile context updated: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
     } catch (error) {
+      console.log(`### Profile context update failed: ${error}`)
       if (isAxiosError(error) && error.response?.status !== 404) {
         throwAsyncError(error);
       }

@@ -6,6 +6,11 @@ import { FormEvent, MutableRefObject, useEffect, useRef, useState } from "react"
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
 
 //TODO: Trocar o avatar por uma imagem
+//Fazer o componente dinâmica
+//Criar um estado para saber se o usuário já tem um profile (enviou o nickname)
+//  Se não enviou, renderizar o formulário do nickname
+//  Se já enviou, renderizar o formulário do avatar
+
 const Welcome = () => {
   const welcomeForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
   const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
@@ -57,7 +62,7 @@ const Welcome = () => {
 
             <div className="form-field-wrapper">
               <label>Enter your nickname</label>
-              <input type="text" name="nickname" placeholder="nickname" />
+              <input type="text" name="nickname" placeholder="nickname" required/>
             </div>
 
             <div className="form-field-wrapper">
