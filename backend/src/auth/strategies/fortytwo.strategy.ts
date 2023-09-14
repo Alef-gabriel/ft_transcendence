@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Strategy } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';

@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 export class AvatarDTO implements Avatar {
   @IsNotEmpty()
@@ -14,5 +15,6 @@ export class AvatarDTO implements Avatar {
   @IsString()
   filename: string;
   @IsNotEmptyObject()
+  @Exclude()
   data: Uint8Array;
 }

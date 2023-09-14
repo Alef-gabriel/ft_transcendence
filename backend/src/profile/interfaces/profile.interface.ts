@@ -2,7 +2,7 @@ import { AvatarEntity, UserEntity } from '../../db/entities';
 
 export interface Profile {
   id: number;
-  nickname: string;
+  nickname?: string;
   wins?: number;
   losses?: number;
   draws?: number;

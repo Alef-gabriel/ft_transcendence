@@ -1,11 +1,15 @@
 import {
   BadRequestException,
+  Get,
   Injectable,
   Logger,
   NotFoundException,
+  Param,
+  ParseIntPipe,
+  Res,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { AvatarEntity, ProfileEntity, UserEntity } from '../db/entities';
+import { ProfileEntity, UserEntity } from '../db/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   DeleteResult,
@@ -17,6 +21,10 @@ import { Profile } from './interfaces/profile.interface';
 import { ProfileDeletedResponseDto } from './models/profile-delete-response.dto';
 import { ProfileUpdatedResponseDto } from './models/profile-updated-response.dto';
 import { AvatarService } from '../avatar/avatar.service';
+import { plainToClass } from 'class-transformer';
+import { ProfileDTO } from './models/profile.dto';
+import { AvatarDTO } from '../avatar/models/avatar.dto';
+import { Readable } from 'stream';
 
 @Injectable()
 export class ProfileService {
@@ -29,7 +37,7 @@ export class ProfileService {
     private readonly profileRepository: Repository<ProfileEntity>,
   ) {}
 
-  async findById(id: number): Promise<any> {
+  async findById(id: number): Promise<ProfileDTO> {
     const profileEntity: ProfileEntity | null =
       await this.profileRepository.findOneBy({
         userEntity: { id },
@@ -40,26 +48,10 @@ export class ProfileService {
     }
 
     this.logger.log(`Profile found for user [${id}]`);
-    return profileEntity;
+    return plainToClass(ProfileDTO, profileEntity);
   }
 
-  async addAvatar(
-    userId: number,
-    imageBuffer: Buffer,
-    filename: string,
-  ): Promise<AvatarEntity> {
-    const avatar: AvatarEntity = await this.avatarService.upload(
-      imageBuffer,
-      filename,
-    );
-
-    await this.profileRepository.update(userId, {
-      avatarId: avatar.id,
-    });
-    return avatar;
-  }
-
-  async create(id: number, nickname: string): Promise<Profile> {
+  async create(id: number, nickname: string): Promise<ProfileDTO> {
     const userEntity: UserEntity | null = await this.userService.findById(id);
 
     if (!userEntity) {
@@ -82,7 +74,7 @@ export class ProfileService {
     }
 
     this.logger.log(`Profile created for user [${id}]`);
-    return savedEntity;
+    return plainToClass(ProfileDTO, savedEntity);
   }
 
   async update(
@@ -121,5 +113,27 @@ export class ProfileService {
       deleted: userDeleteResult.affected > 0,
       affected: userDeleteResult.affected,
     };
+  }
+
+  async addAvatar(
+    userId: number,
+    imageBuffer: Buffer,
+    filename: string,
+  ): Promise<AvatarDTO> {
+    this.logger.verbose(`Adding avatar for user [${userId}]`);
+
+    const avatar: AvatarDTO = await this.avatarService.upload(
+      imageBuffer,
+      filename,
+    );
+
+    this.logger.verbose(`Adding avatarId for user profile [${userId}]`);
+    await this.profileRepository.update(
+      { userEntity: { id: userId } },
+      { avatarId: avatar.id },
+    );
+
+    this.logger.log(`Avatar added for user [${userId}]`);
+    return avatar;
   }
 }

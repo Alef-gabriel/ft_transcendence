@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 export class FortyTwoUserDto implements FortyTwoUser {
   @IsNumber()
@@ -30,5 +31,10 @@ export class FortyTwoUserDto implements FortyTwoUser {
   otpValidated?: boolean;
   @IsBoolean()
   @IsOptional()
+  @Exclude()
   otpSecret?: string;
+
+  constructor(partial: Partial<FortyTwoUserDto>) {
+    Object.assign(this, partial);
+  }
 }

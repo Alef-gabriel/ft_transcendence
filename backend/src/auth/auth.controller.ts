@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   HttpCode,
@@ -10,6 +11,7 @@ import {
   Res,
   Session,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   FortyTwoAuthGuard,
@@ -23,6 +25,7 @@ import { FortyTwoUserDto } from '../user/models/forty-two-user.dto';
 import { OneTimePasswordDto } from './models/one-time-password.dto';
 import { ResponseMessageDto } from './models/response-message.dto';
 import { ConfigService } from '@nestjs/config';
+import { plainToClass } from 'class-transformer';
 
 @Controller('auth')
 export class AuthController {
@@ -110,22 +113,24 @@ export class AuthController {
   @DisableTwoFactorAuthenticationBlock()
   @Get('2fa/session')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ClassSerializerInterceptor)
   async session2fa(
     @Req() { user }: { user: FortyTwoUserDto },
     @Session() session: Record<string, any>,
   ): Promise<FortyTwoUserDto> {
     this.logger.debug(`### user session: ${JSON.stringify(session)}`);
-    return { ...user, otpSecret: undefined };
+    return plainToClass(FortyTwoUserDto, user);
   }
 
   @Get('session')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ClassSerializerInterceptor)
   async session(
     @Req() { user }: { user: FortyTwoUserDto },
     @Session() session: Record<string, any>,
   ): Promise<FortyTwoUserDto> {
     this.logger.debug(`### user session: ${JSON.stringify(session)}`);
-    return { ...user, otpSecret: undefined };
+    return plainToClass(FortyTwoUserDto, user);
   }
 
   // Debug route to check if user is authenticated

@@ -12,6 +12,8 @@ import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { toDataURL, toFileStream } from 'qrcode';
 import { FortyTwoUser, OneTimePassword } from './index';
+import { plainToClass } from 'class-transformer';
+import { FortyTwoUserDto } from '../user/models/forty-two-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +27,7 @@ export class AuthService {
   async loginUser(user: FortyTwoUser): Promise<FortyTwoUser> {
     this.logger.debug(`### OAuth2 user: ${JSON.stringify(user)}`);
 
-    const userEntity: UserEntity = this.convertSessionToEntity(user);
+    const userEntity: UserEntity = plainToClass(UserEntity, user);
     const databaseUser: UserEntity | null = await this.userService.findByEmail(
       user.email,
     );
@@ -35,12 +37,12 @@ export class AuthService {
     );
     if (databaseUser) {
       await this.userService.update(userEntity);
-      return this.convertEntityToSession(databaseUser);
+      return plainToClass(FortyTwoUserDto, databaseUser);
     }
 
     this.logger.log(`### User [${user.id}] not found. Creating new user`);
     const newUser: UserEntity = await this.userService.create(userEntity);
-    return this.convertEntityToSession(await this.userService.save(newUser));
+    return plainToClass(FortyTwoUserDto, await this.userService.save(newUser));
   }
 
   //Create new session for the two factor authenticated user, using express-session

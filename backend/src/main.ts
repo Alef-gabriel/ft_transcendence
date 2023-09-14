@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
@@ -6,7 +6,12 @@ import { TypeormStore } from 'connect-typeorm';
 import { DataSource } from 'typeorm';
 import { SessionEntity } from './db/entities';
 import { ConfigService } from '@nestjs/config';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  INestApplication,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 
 async function bootstrap() {
   const configService: ConfigService<Record<string, any>> = new ConfigService();
