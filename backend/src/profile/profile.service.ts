@@ -32,7 +32,7 @@ export class ProfileService {
     private readonly profileRepository: Repository<ProfileEntity>,
   ) {}
 
-  async findById(id: number): Promise<ProfileDTO> {
+  async findByUserId(id: number): Promise<ProfileDTO> {
     const profileEntity: ProfileEntity | null =
       await this.profileRepository.findOneBy({
         userEntity: { id },

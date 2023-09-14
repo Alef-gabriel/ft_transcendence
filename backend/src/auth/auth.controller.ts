@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  NotFoundException,
   Post,
   Req,
   Res,
@@ -26,6 +27,8 @@ import { OneTimePasswordDto } from './models/one-time-password.dto';
 import { ResponseMessageDto } from './models/response-message.dto';
 import { ConfigService } from '@nestjs/config';
 import { plainToClass } from 'class-transformer';
+import { ProfileService } from '../profile/profile.service';
+import { ProfileDTO } from '../profile/models/profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -56,9 +59,17 @@ export class AuthController {
       this.configService.get<string>('APP_OAUTH2_REDIRECT') ||
       'http://localhost:5173';
 
-    user.otpEnabled
-      ? res.redirect(redirectUrl + '/validate-otp')
-      : res.redirect(redirectUrl);
+    const hasProfile: boolean = await this.authService.userHasProfile(user);
+
+    if (!hasProfile) {
+      res.redirect(redirectUrl + '/welcome');
+    }
+
+    if (user.otpEnabled) {
+      res.redirect(redirectUrl + '/validate-otp');
+    }
+
+    res.redirect(redirectUrl);
   }
 
   @Get('logout')

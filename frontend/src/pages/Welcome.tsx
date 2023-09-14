@@ -49,7 +49,7 @@ const Welcome = () => {
   return (
     <>
       <div className="container">
-        <h1 className="welcome-title">Welcome to the Pong!</h1>
+        <h1 className="welcome-title">Welcome to Pong!</h1>
       </div>
 
         <div className="welcome-form-wrapper">

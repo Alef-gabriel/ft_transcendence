@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserEntity } from '../db/entities';
@@ -14,6 +15,8 @@ import { toDataURL, toFileStream } from 'qrcode';
 import { FortyTwoUser, OneTimePassword } from './index';
 import { plainToClass } from 'class-transformer';
 import { FortyTwoUserDto } from '../user/models/forty-two-user.dto';
+import { ProfileDTO } from '../profile/models/profile.dto';
+import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +25,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
+    private readonly profileService: ProfileService,
   ) {}
 
   async loginUser(user: FortyTwoUser): Promise<FortyTwoUser> {
@@ -159,51 +163,20 @@ export class AuthService {
     return await toDataURL(otpAuthUrl);
   }
 
-  private convertSessionToEntity(user: FortyTwoUser): UserEntity {
-    const {
-      id,
-      username,
-      displayName,
-      email,
-      profileUrl,
-      otpEnabled,
-      otpSecret,
-      otpValidated,
-    } = user;
-    const userEntity: UserEntity = new UserEntity();
+  public async userHasProfile(user: FortyTwoUserDto): Promise<boolean> {
+    try {
+      const profileDTO: ProfileDTO = await this.profileService.findByUserId(
+        user.id,
+      );
 
-    userEntity.id = id;
-    userEntity.username = username;
-    userEntity.displayName = displayName;
-    userEntity.email = email;
-    userEntity.profileUrl = profileUrl;
-    userEntity.otpEnabled = otpEnabled;
-    userEntity.otpSecret = otpSecret;
-    userEntity.otpValidated = otpValidated;
-
-    return userEntity;
-  }
-
-  private convertEntityToSession(userEntity: UserEntity): FortyTwoUser {
-    const {
-      id,
-      username,
-      displayName,
-      email,
-      profileUrl,
-      otpEnabled,
-      otpSecret,
-      otpValidated,
-    } = userEntity;
-    return {
-      id,
-      username,
-      displayName,
-      email,
-      profileUrl,
-      otpEnabled,
-      otpSecret,
-      otpValidated,
-    };
+      if (profileDTO) {
+        return true;
+      }
+    } catch (e) {
+      if (!(e instanceof NotFoundException)) {
+        throw e;
+      }
+    }
+    return false;
   }
 }

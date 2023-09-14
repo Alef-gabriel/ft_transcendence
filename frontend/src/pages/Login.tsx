@@ -9,7 +9,6 @@ const Login = () => {
   const navigate: NavigateFunction = useNavigate();
   const { user } = useAuth() as AuthContextData;
 
-
   useEffect(() => {
     if (user) {
       navigate('/');

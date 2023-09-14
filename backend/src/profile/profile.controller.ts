@@ -45,7 +45,7 @@ export class ProfileController {
   async getProfile(
     @Req() { user }: { user: FortyTwoUserDto },
   ): Promise<ProfileDTO> {
-    return await this.profileService.findById(user.id);
+    return await this.profileService.findByUserId(user.id);
   }
 
   @Post('create')

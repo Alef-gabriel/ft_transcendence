@@ -2,7 +2,7 @@ import { createContext, FC, ReactNode, useContext, useEffect, useState } from "r
 import { ProfileContextData } from "./interfaces/ProfileContextData";
 import useThrowAsyncError from "./hooks/useThrowAsyncError";
 import { ProfileDTO } from "../../backend/src/profile/models/profile.dto";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import AuthContext from "./AuthContext";
 
 const ProfileContext = createContext({});
@@ -29,8 +29,9 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       console.log(`### Profile context updated: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
     } catch (error) {
-      console.log(error);
-      throwAsyncError(error);
+      if (isAxiosError(error) && error.response?.status !== 404) {
+        throwAsyncError(error);
+      }
     }
   };
 
