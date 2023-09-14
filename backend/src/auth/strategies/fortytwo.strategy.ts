@@ -10,7 +10,7 @@ import { FortyTwoUser } from '../index';
 //This class is used to do 42 OAuth2 authentication
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy) {
-  private readonly logger = new Logger(FortyTwoStrategy.name);
+  private readonly logger: Logger = new Logger(FortyTwoStrategy.name);
 
   constructor(
     private readonly authService: AuthService,

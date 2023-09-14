@@ -2,10 +2,12 @@ import { createContext, FC, ReactNode, useContext, useEffect, useState } from "r
 import { AuthContextData } from "./interfaces/AuthContextData.ts";
 import axios from "axios";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { FortyTwoUserDto } from "../../backend/src/auth/models/forty-two-user.dto.ts";
+import { FortyTwoUserDto } from "../../backend/src/user/models/forty-two-user.dto.ts";
 import useThrowAsyncError from "./hooks/useThrowAsyncError.ts";
 
 const AuthContext = createContext({});
+
+AuthContext.displayName = 'AuthContext';
 
 interface AuthProviderProps {
   children: ReactNode;
