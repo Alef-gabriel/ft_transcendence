@@ -13,7 +13,7 @@ const Profile = () => {
   const { profile, getAvatarImage} = useProfile() as ProfileContextData;
 
   const handleAvatar = async () => {
-    const imageSrc = await getAvatarImage();
+    const imageSrc = await getAvatarImage(profile?.avatarId);
     setImageSrc(imageSrc);
   }
 

@@ -5,5 +5,5 @@ export interface ProfileContextData {
   updateProfileContext: () => void;
   createProfile: (nickname: string) => Promise<void>;
   uploadAvatarImage: (formData: FormData) => Promise<void>;
-  getAvatarImage: () => Promise<string | undefined>
+  getAvatarImage: (avatarId: number | undefined) => Promise<string | undefined>
 }

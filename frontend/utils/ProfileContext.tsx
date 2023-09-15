@@ -14,6 +14,7 @@ interface ProfileProvideProps {
 }
 
 export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
+  const [loading, setLoading] = useState<boolean>(true);
   const [profile, setProfile] = useState<ProfileDTO | null>(null);
   const throwAsyncError = useThrowAsyncError();
 
@@ -22,12 +23,17 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     updateProfileContext();
   }, []);
 
+  useEffect(() => {
+    getAvatarImage(profile?.avatarId);
+  }, [profile?.avatarId]);
+
   const updateProfileContext = async (): Promise<void> => {
     try {
       const response = await axios.get("http://localhost:3000/api/profile",
         { withCredentials: true });
       console.log(`### Profile context updated: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
+      setLoading(false);
     } catch (error) {
       console.log(`### Profile context update failed: ${error}`);
       if (isAxiosError(error) && error.response?.status !== 404) {
@@ -66,10 +72,14 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
   };
 
-  const getAvatarImage = async (): Promise<string | undefined> => {
+  const getAvatarImage = async (avatarId: number | undefined): Promise<string | undefined> => {
+    if (!avatarId) {
+      return undefined;
+    }
+
     try {
       const response = await axios
-        .get(`http://localhost:3000/api/profile/avatar/${profile?.avatarId}`, {
+        .get(`http://localhost:3000/api/profile/avatar/${avatarId}`, {
           responseType: 'blob',
           withCredentials: true,
         });
@@ -86,7 +96,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
 
   return (
     <ProfileContext.Provider value={contextData}>
-      {children}
+      {loading ? <p>Loading...</p> : children}
     </ProfileContext.Provider>
   );
 };
