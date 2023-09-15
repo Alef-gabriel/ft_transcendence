@@ -1,33 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
-import { Profile } from "../../../backend/src/profile/interfaces/profile.interface.ts";
 import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
 import { useAuth } from "../../utils/AuthContext.tsx";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
+import { useProfile } from "../../utils/ProfileContext.tsx";
+import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
 
 const Profile = () => {
   const navigate: NavigateFunction = useNavigate();
-  const throwAsyncError = useThrowAsyncError();
   const { user, disable2FA } = useAuth() as AuthContextData;
-  const [profile, setProfile] = useState<Profile | undefined>(undefined);
-
-  //TODO: Criar um Context para o Profile, no futuro diversos componentes usarão esses dados. Exibir as informações do Profile.
-  const fetchData = useCallback(async () => {
-      const response = await axios.get("http://localhost:3000/api/profile",
-        { withCredentials: true });
-
-      setProfile(response.data);
-  }, [])
-
-  useEffect(() => {
-    fetchData()
-      .catch((error) => {
-        console.log(error)
-        throwAsyncError(error);
-      });
-  }, [fetchData]);
-
+  const { profile} = useProfile() as ProfileContextData;
 
   return (
     <div className="container">
