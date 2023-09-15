@@ -1,19 +1,8 @@
 import { useProfile } from "../../utils/ProfileContext.tsx";
 import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
-import { useEffect, useState } from "react";
 
 const Home = () => {
-  const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
-  const { profile, getAvatarImage} = useProfile() as ProfileContextData;
-
-  const handleAvatar = async () => {
-    const imageSrc = await getAvatarImage(profile?.avatarId);
-    setImageSrc(imageSrc);
-  }
-
-  useEffect(() => {
-    handleAvatar();
-  }, []);
+  const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
 
   return (
 
@@ -22,7 +11,7 @@ const Home = () => {
 
       <br></br>
       <div>
-        {imageSrc && <img src={imageSrc} alt="Image" />}
+        {avatarImageUrl && <img src={avatarImageUrl} alt="User avatar" />}
         <p>Nickname: {profile?.nickname}</p>
       </div>
       <br></br>

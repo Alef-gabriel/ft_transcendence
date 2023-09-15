@@ -3,23 +3,12 @@ import { useAuth } from "../../utils/AuthContext.tsx";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useProfile } from "../../utils/ProfileContext.tsx";
 import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
-import { useEffect, useState } from "react";
-
 
 const Profile = () => {
-  const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
   const navigate: NavigateFunction = useNavigate();
   const { user, disable2FA } = useAuth() as AuthContextData;
-  const { profile, getAvatarImage} = useProfile() as ProfileContextData;
+  const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
 
-  const handleAvatar = async () => {
-    const imageSrc = await getAvatarImage(profile?.avatarId);
-    setImageSrc(imageSrc);
-  }
-
-  useEffect(() => {
-    handleAvatar();
-  }, []);
 
   return (
     <div className="container">
@@ -27,7 +16,7 @@ const Profile = () => {
 
       <br></br>
       <div>
-        {imageSrc && <img src={imageSrc} alt="Image" />}
+        {avatarImageUrl && <img src={avatarImageUrl} alt="Image" />}
         <p>Nickname: {profile?.nickname}</p>
       </div>
 

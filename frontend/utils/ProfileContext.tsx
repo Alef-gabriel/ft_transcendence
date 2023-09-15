@@ -15,6 +15,7 @@ interface ProfileProvideProps {
 
 export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [avatarImageUrl, setAvatarImageUrl] = useState<string | undefined>(undefined);
   const [profile, setProfile] = useState<ProfileDTO | null>(null);
   const throwAsyncError = useThrowAsyncError();
 
@@ -25,7 +26,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
 
   useEffect(() => {
     getAvatarImage(profile?.avatarId);
-  }, [profile?.avatarId]);
+  }, [profile]);
 
   const updateProfileContext = async (): Promise<void> => {
     try {
@@ -72,9 +73,9 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
   };
 
-  const getAvatarImage = async (avatarId: number | undefined): Promise<string | undefined> => {
+  const getAvatarImage = async (avatarId :number | undefined): Promise<void> => {
     if (!avatarId) {
-      return undefined;
+      return;
     }
 
     try {
@@ -85,14 +86,14 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
         });
 
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
-      return URL.createObjectURL(blob);
+      setAvatarImageUrl(URL.createObjectURL(blob));
     } catch(error) {
       console.error('Error fetching image:', error);
       throwAsyncError(error);
     }
   }
 
-  const contextData: ProfileContextData = { profile, updateProfileContext, createProfile, uploadAvatarImage, getAvatarImage };
+  const contextData: ProfileContextData = { profile, avatarImageUrl, updateProfileContext, createProfile, uploadAvatarImage };
 
   return (
     <ProfileContext.Provider value={contextData}>
