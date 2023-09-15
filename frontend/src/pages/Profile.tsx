@@ -3,37 +3,41 @@ import { useAuth } from "../../utils/AuthContext.tsx";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useProfile } from "../../utils/ProfileContext.tsx";
 import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
+import { useEffect, useState } from "react";
 
 
 //TODO: Trocar o avatar por uma imagem do backend
 const Profile = () => {
+  const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
   const navigate: NavigateFunction = useNavigate();
   const { user, disable2FA } = useAuth() as AuthContextData;
-  const { profile} = useProfile() as ProfileContextData;
+  const { profile, getAvatarImage} = useProfile() as ProfileContextData;
+
+  const handleAvatar = async () => {
+    const imageSrc = await getAvatarImage();
+    setImageSrc(imageSrc);
+  }
+
+  useEffect(() => {
+    handleAvatar();
+  }, []);
 
   return (
     <div className="container">
       <h1>User Profile</h1>
 
-      <br></br>
-
-      <p>AvatarId: {profile?.avatarId}</p>
-
-      <br></br>
-
-      <p>Nickname: {profile?.nickname}</p>
+      <div>
+        {imageSrc && <img src={imageSrc} alt="Image" />}
+        <p>Nickname: {profile?.nickname}</p>
+      </div>
 
       <br></br>
-
       <button className="btn">Change Avatar (Not Impl)</button>
 
       <br></br>
-
       <button className="btn">Change Nickname (Not Impl)</button>
 
-
       <br></br>
-
       <button className="btn" onClick={ user?.otpEnabled ? disable2FA : () => navigate("/register-2fa")} >
         { user?.otpEnabled ? "Disable Two Factor Authentication" : "Enable Two Factor Authentication"}
       </button>

@@ -49,7 +49,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
   };
 
-  const uploadImage = async (formData: FormData): Promise<void> => {
+  const uploadAvatarImage = async (formData: FormData): Promise<void> => {
     try {
       const response = await axios.post("http://localhost:3000/api/profile/avatar", formData, {
         headers: {
@@ -66,7 +66,23 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
   };
 
-  const contextData: ProfileContextData = { profile, updateProfileContext, createProfile, uploadImage };
+  const getAvatarImage = async (): Promise<string | undefined> => {
+    try {
+      const response = await axios
+        .get(`http://localhost:3000/api/profile/avatar/${profile?.avatarId}`, {
+          responseType: 'blob',
+          withCredentials: true,
+        });
+
+      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      return URL.createObjectURL(blob);
+    } catch(error) {
+      console.error('Error fetching image:', error);
+      throwAsyncError(error);
+    }
+  }
+
+  const contextData: ProfileContextData = { profile, updateProfileContext, createProfile, uploadAvatarImage, getAvatarImage };
 
   return (
     <ProfileContext.Provider value={contextData}>
