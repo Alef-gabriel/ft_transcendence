@@ -4,6 +4,8 @@ import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useProfile } from "../../utils/ProfileContext.tsx";
 import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
 
+
+//TODO: Trocar o avatar por uma imagem do backend
 const Profile = () => {
   const navigate: NavigateFunction = useNavigate();
   const { user, disable2FA } = useAuth() as AuthContextData;
@@ -23,11 +25,11 @@ const Profile = () => {
 
       <br></br>
 
-      <button className="btn">Change Avatar</button>
+      <button className="btn">Change Avatar (Not Impl)</button>
 
       <br></br>
 
-      <button className="btn">Change Nickname</button>
+      <button className="btn">Change Nickname (Not Impl)</button>
 
 
       <br></br>
@@ -38,7 +40,7 @@ const Profile = () => {
 
       <br></br>
 
-      <button className="btn">Delete Account</button>
+      <button className="btn">Delete Account (Not Impl)</button>
 
     </div>
   );
