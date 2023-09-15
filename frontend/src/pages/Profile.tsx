@@ -6,7 +6,6 @@ import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts
 import { useEffect, useState } from "react";
 
 
-//TODO: Trocar o avatar por uma imagem do backend
 const Profile = () => {
   const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
   const navigate: NavigateFunction = useNavigate();
@@ -24,8 +23,9 @@ const Profile = () => {
 
   return (
     <div className="container">
-      <h1>User Profile</h1>
+      <h1>User Profile Settings</h1>
 
+      <br></br>
       <div>
         {imageSrc && <img src={imageSrc} alt="Image" />}
         <p>Nickname: {profile?.nickname}</p>
