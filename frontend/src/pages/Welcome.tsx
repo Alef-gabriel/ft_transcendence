@@ -17,7 +17,7 @@ const Welcome = () => {
   const welcomeForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
   const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
   const throwAsyncError = useThrowAsyncError();
-  const { profile, createProfile, uploadImage } = useProfile() as ProfileContextData;
+  const { profile, createProfile, uploadAvatarImage } = useProfile() as ProfileContextData;
   const navigate: NavigateFunction = useNavigate();
   const [nicknameSaved, setNicknameSaved] = useState<boolean>(false);
   const [selectedAvatar, setSelectedAvatar] = useState<File | undefined>(undefined);
@@ -74,7 +74,7 @@ const Welcome = () => {
 
     try {
 
-      await uploadImage(formData);
+      await uploadAvatarImage(formData);
       setAvatarSaved(true);
 
     } catch (error) {
