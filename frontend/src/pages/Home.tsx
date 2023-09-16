@@ -1,8 +1,18 @@
 import { useProfile } from "../../utils/ProfileContext.tsx";
 import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
+import { useEffect } from "react";
 
 const Home = () => {
   const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
+  const { updateProfileContext } = useProfile() as ProfileContextData;
+
+  useEffect(() => {
+    if (!avatarImageUrl) {
+      console.log(`### Avatar Image URL undefined`);
+      updateProfileContext();
+      return;
+    }
+  }, []);
 
   return (
 
