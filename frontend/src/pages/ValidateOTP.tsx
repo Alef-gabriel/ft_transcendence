@@ -18,9 +18,6 @@ const ValidateOTP = () => {
     if (!registerForm.current) {
       return;
     }
-
-    console.log(`### Validating 2FA with code ${registerForm.current.code?.value}`);
-
     try {
       const isOtpValid: boolean = await validateOTP(registerForm.current.code?.value);
 

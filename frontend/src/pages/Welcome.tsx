@@ -15,23 +15,21 @@ import { ProfileContextData } from "../../context/interfaces/ProfileContextData.
 
 const Welcome = () => {
   const welcomeForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
-  const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
-  const throwAsyncError = useThrowAsyncError();
   const { profile, createProfile, uploadAvatarImage } = useProfile() as ProfileContextData;
   const navigate: NavigateFunction = useNavigate();
+  const throwAsyncError = useThrowAsyncError();
+  const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
   const [nicknameSaved, setNicknameSaved] = useState<boolean>(false);
-  const [selectedAvatar, setSelectedAvatar] = useState<File | undefined>(undefined);
   const [avatarSaved, setAvatarSaved] = useState<boolean>(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<File | undefined>(undefined);
 
 
   //verificar porque nao ta funcionando
   useEffect(() => {
     if (profile && avatarSaved) {
-      console.log(`### Profile already exists, redirecting to home`);
       navigate("/");
       return;
     }
-    console.log(`### Profile doesn't exist, rendering welcome page`);
   }, [avatarSaved, navigate, profile]);
 
   const handleNicknameSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -64,21 +62,19 @@ const Welcome = () => {
   const handleAvatarSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
-    if (!selectedAvatar) {
+    const formData: FormData = new FormData();
+
+    if (!selectedAvatar) { //Todo: Trocar por um avatar default
       alert('Please select an image to upload.');
       return;
     }
 
-    const formData: FormData = new FormData();
     formData.append('avatar', selectedAvatar);
 
     try {
-
       await uploadAvatarImage(formData);
       setAvatarSaved(true);
-
     } catch (error) {
-      console.error('Error uploading image:', error);
       throwAsyncError(error);
     }
   }

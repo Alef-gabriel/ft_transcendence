@@ -1,9 +1,9 @@
 import { FormEvent, MutableRefObject, useRef, useState } from "react";
 import { AuthContextData } from "../../context/interfaces/AuthContextData.ts";
 import { useAuth } from "../../context/AuthContext.tsx";
-import axios from "axios";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
+import authService from "../../api/AuthService.ts";
 
 const Register2FA = () => {
   const registerForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
@@ -14,16 +14,10 @@ const Register2FA = () => {
   const throwAsyncError = useThrowAsyncError();
 
   const handleRegisterQRCode = () => {
-    axios
-      .get('http://localhost:3000/api/auth/2fa/qr-code', { withCredentials: true })
-      .then((response) => {
-        setQRCode(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching QR code:', error);
-      });
+      authService.get2FAQRCode()
+      .then((response) => setQRCode(response.data))
+      .catch((error) => throwAsyncError(error));
   };
-
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -33,7 +27,6 @@ const Register2FA = () => {
     }
 
     try {
-      console.log(`### Registering 2FA with code ${registerForm.current.code?.value}`);
       const isOtpValid: boolean = await enable2FA(registerForm.current.code?.value);
 
       if (!isOtpValid) {

@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.tsx";
 import { AuthContextData } from "../../context/interfaces/AuthContextData.ts";
+import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
+import { useProfile } from "../../context/ProfileContext.tsx";
 
 const Header = () => {
   const { user, logoutUser } = useAuth() as AuthContextData;
+  const { profile } = useProfile() as ProfileContextData;
 
   return (
     <div className="header">
@@ -12,7 +15,7 @@ const Header = () => {
       </div>
 
       <div className="links--wrapper">
-        { user ? (
+        { user && profile ? (
           <>
             <Link to="/" className="header--link">Home</Link>
             <Link to="/profile" className="header--link">Profile</Link>

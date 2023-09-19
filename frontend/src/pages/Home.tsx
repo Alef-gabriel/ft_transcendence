@@ -3,8 +3,7 @@ import { ProfileContextData } from "../../context/interfaces/ProfileContextData.
 import { useEffect } from "react";
 
 const Home = () => {
-  const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
-  const { updateProfileContext } = useProfile() as ProfileContextData;
+  const { profile, avatarImageUrl, updateProfileContext} = useProfile() as ProfileContextData;
 
   useEffect(() => {
     if (!avatarImageUrl) {

@@ -33,6 +33,10 @@ class AuthService {
   public async validateOTP(code: string) {
     return this.axiosInstance.post('/2fa/validate', { code });
   }
+
+  public async get2FAQRCode() {
+    return this.axiosInstance.get('/2fa/qr-code');
+  }
 }
 
 const authService: AuthService = new AuthService('http://localhost:3000/api/auth');

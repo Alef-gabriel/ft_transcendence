@@ -8,8 +8,7 @@ import { useEffect } from "react";
 const Profile = () => {
   const navigate: NavigateFunction = useNavigate();
   const { user, disable2FA } = useAuth() as AuthContextData;
-  const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
-  const { updateProfileContext } = useProfile() as ProfileContextData;
+  const { profile, avatarImageUrl, updateProfileContext} = useProfile() as ProfileContextData;
 
   useEffect(() => {
     if (!avatarImageUrl) {

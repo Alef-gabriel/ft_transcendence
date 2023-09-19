@@ -4,6 +4,7 @@ import axios from "axios";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { FortyTwoUserDto } from "../../backend/src/user/models/forty-two-user.dto.ts";
 import useThrowAsyncError from "../utils/hooks/useThrowAsyncError.ts";
+import authService from "../api/AuthService.ts";
 
 const AuthContext = createContext({});
 
@@ -21,48 +22,26 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const throwAsyncError = useThrowAsyncError();
 
   useEffect(() => {
-    if (location.pathname === "/validate-otp") {
-      console.log(`### Validating 2FA session for path: ${location.pathname}`)
-      validate2FASession();
-      return
-    }
 
-    console.log(`### Validating user session for path: ${location.pathname}`)
-    validateUserSession();
+    validateUserSession().then(() => setLoading(false));
   }, [navigate]);
-
-  const validate2FASession = async (): Promise<void> => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/auth/2fa/session",
-        { withCredentials: true });
-
-      setUser(response.data);
-    } catch (error) {
-      throwAsyncError(error);
-    }
-
-    setLoading(false)
-  }
 
   const validateUserSession = async (): Promise<void> => {
     try {
-        const response = await axios.get("http://localhost:3000/api/auth/session",
-          { withCredentials: true });
-      console.log("### User session validated");
+      const response = location.pathname === "/validate-otp"
+        ? await authService.validate2FASession()
+        : await authService.validateUserSession();
+
       setUser(response.data);
     } catch (error) {
-      console.log(error);
       setUser(null);
       navigate('/login');
     }
-
-    setLoading(false);
   };
 
   const logoutUser = async (): Promise<void> => {
     try {
-      await axios.get("http://localhost:3000/api/auth/logout",
-        { withCredentials: true });
+      await authService.logoutUser();
       setUser(null);
     } catch (error) {
       throwAsyncError(error);
@@ -71,7 +50,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const enable2FA = async (code: string): Promise<boolean> => {
     try {
-      await axios.post("http://localhost:3000/api/auth/2fa/turn-on", { code }, { withCredentials: true });
+      await authService.enable2FA(code);
     } catch (error) {
       console.log(error);
 
@@ -86,8 +65,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const disable2FA = async (): Promise<void> => {
     try {
-      await axios.post("http://localhost:3000/api/auth/2fa/turn-off", {}, { withCredentials: true });
-      validateUserSession();
+      await authService.disable2FA();
+      await validateUserSession();
     } catch (error) {
       throwAsyncError(error);
     }
@@ -95,10 +74,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const validateOTP = async (code: string): Promise<boolean> => {
     try {
-      await axios.post("http://localhost:3000/api/auth/2fa/validate", { code }, { withCredentials: true });
-    } catch (error) {
-      console.log(error);
 
+      await authService.validateOTP(code);
+
+    } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status !== 401) {
         throwAsyncError(error);
       }
@@ -107,7 +86,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
     return true;
   };
-
 
   const contextData: AuthContextData = { user, logoutUser, enable2FA, disable2FA, validateOTP };
 
