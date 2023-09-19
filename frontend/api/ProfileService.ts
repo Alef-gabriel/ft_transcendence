@@ -15,16 +15,22 @@ class ProfileService {
     return this.axiosInstance.get('');
   }
 
+  public async getAvatarImage(avatarId: number) {
+    return this.axiosInstance.post(`$/avatar/${avatarId}`, {
+      responseType: 'blob'
+    });
+  }
+
   public async createProfile(nickname: string) {
     return this.axiosInstance.post('/create', { nickname });
   }
 
   public async uploadAvatarImage(formData: FormData) {
-    return this.axiosInstance.post('/avatar', formData);
-  }
-
-  public async getAvatarImage(avatarId: number) {
-    return this.axiosInstance.post(`$/avatar/${avatarId}`);
+    return this.axiosInstance.post('/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   }
 }
 

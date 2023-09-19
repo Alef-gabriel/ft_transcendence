@@ -24,7 +24,10 @@ const Profile = () => {
 
       <br></br>
       <div>
-        {avatarImageUrl && <img src={avatarImageUrl} alt="Image" />}
+        {avatarImageUrl
+          ? <img src={avatarImageUrl} alt="User Avatar Image" />
+          : <img src= "/default-avatar.jpeg" alt="Default Avatar Image"/>
+        }
         <p>Nickname: {profile?.nickname}</p>
       </div>
 

@@ -20,7 +20,10 @@ const Home = () => {
 
       <br></br>
       <div>
-        {avatarImageUrl && <img src={avatarImageUrl} alt="User avatar" />}
+        {avatarImageUrl
+          ? <img src={avatarImageUrl} alt="User Avatar Image" />
+          : <img src= "/default-avatar.jpeg" alt="Default Avatar Image"/>
+        }
         <p>Nickname: {profile?.nickname}</p>
       </div>
       <br></br>

@@ -20,17 +20,16 @@ const Welcome = () => {
   const throwAsyncError = useThrowAsyncError();
   const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
   const [nicknameSaved, setNicknameSaved] = useState<boolean>(false);
-  const [avatarSaved, setAvatarSaved] = useState<boolean>(false);
+  const [continueToHome, setContinueToHome] = useState<boolean>(false);
   const [selectedAvatar, setSelectedAvatar] = useState<File | undefined>(undefined);
 
 
-  //verificar porque nao ta funcionando
   useEffect(() => {
-    if (profile && avatarSaved) {
+    if (profile && continueToHome) {
       navigate("/");
       return;
     }
-  }, [avatarSaved, navigate, profile]);
+  }, [continueToHome, navigate, profile]);
 
   const handleNicknameSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -42,7 +41,6 @@ const Welcome = () => {
     const nickname: string | undefined = welcomeForm.current.nickname?.value;
 
     try {
-      console.log(`### Creating profile with nickname: ${nickname}`);
       if (!nickname || nickname?.length < 4) {
         setInvalidProfile(true);
         return;
@@ -64,8 +62,8 @@ const Welcome = () => {
 
     const formData: FormData = new FormData();
 
-    if (!selectedAvatar) { //Todo: Trocar por um avatar default
-      alert('Please select an image to upload.');
+    if (!selectedAvatar) {
+      setContinueToHome(true);
       return;
     }
 
@@ -73,7 +71,7 @@ const Welcome = () => {
 
     try {
       await uploadAvatarImage(formData);
-      setAvatarSaved(true);
+      setContinueToHome(true);
     } catch (error) {
       throwAsyncError(error);
     }

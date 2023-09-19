@@ -22,7 +22,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const throwAsyncError = useThrowAsyncError();
 
   useEffect(() => {
-
     validateUserSession().then(() => setLoading(false));
   }, [navigate]);
 
@@ -52,12 +51,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     try {
       await authService.enable2FA(code);
     } catch (error) {
-      console.log(error);
-
       if (axios.isAxiosError(error) && error.response?.status !== 401) {
         throwAsyncError(error);
       }
-
       return false;
     }
     return true;
@@ -73,14 +69,11 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const validateOTP = async (code: string): Promise<boolean> => {
     try {
-
       await authService.validateOTP(code);
-
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status !== 401) {
         throwAsyncError(error);
       }
-
       return false;
     }
     return true;
