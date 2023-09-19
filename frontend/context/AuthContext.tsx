@@ -66,7 +66,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const disable2FA = async (): Promise<void> => {
     try {
       await authService.disable2FA();
-      await validateUserSession();
     } catch (error) {
       throwAsyncError(error);
     }

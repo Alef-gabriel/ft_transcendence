@@ -5,6 +5,7 @@ import { ProfileDTO } from "../../backend/src/profile/models/profile.dto";
 import axios, { isAxiosError } from "axios";
 import AuthContext from "./AuthContext";
 import { useLocation } from "react-router-dom";
+import { AuthContextData } from "./interfaces/AuthContextData.ts";
 
 const ProfileContext = createContext({});
 
@@ -16,6 +17,7 @@ interface ProfileProvideProps {
 
 //TODO: Bug Avatar não aparece na primeira vez que o usuário faz login
 export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
+  const { user } = useContext(AuthContext) as AuthContextData;
   const [loading, setLoading] = useState<boolean>(true);
   const [avatarImageUrl, setAvatarImageUrl] = useState<string | undefined>(undefined);
   const [profile, setProfile] = useState<ProfileDTO | null>(null);
@@ -23,7 +25,10 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    console.log(`### Profile context initialized`);
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     updateProfileContext();
   }, []);
 
