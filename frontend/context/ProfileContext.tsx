@@ -82,7 +82,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       });
 
       console.log(`### Avatar uploaded: ${JSON.stringify(response.data)}`);
-      updateProfileContext();
+      await updateProfileContext();
     } catch (error) {
       console.log(`### Avatar upload failed: ${error}`);
       throwAsyncError(error);

@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import Header from "../components/Header.tsx";
+import Header from "./Header.tsx";
 import { isAxiosError } from "axios";
 
 interface ErrorBoundaryProps {

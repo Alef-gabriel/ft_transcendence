@@ -9,7 +9,7 @@ import PrivateRoutes from "./components/PrivateRoutes.tsx";
 import { AuthProvider } from "../context/AuthContext.tsx";
 import ValidateOTP from "./pages/ValidateOTP.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import ErrorBoundary from "./pages/ErrorBoundary.tsx";
+import ErrorBoundary from "./components/ErrorBoundary.tsx";
 import Welcome from "./pages/Welcome.tsx";
 import { ProfileProvider } from "../context/ProfileContext.tsx";
 
