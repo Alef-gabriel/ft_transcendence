@@ -1,8 +1,8 @@
-import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
-import { useAuth } from "../../utils/AuthContext.tsx";
+import { AuthContextData } from "../../context/interfaces/AuthContextData.ts";
+import { useAuth } from "../../context/AuthContext.tsx";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { useProfile } from "../../utils/ProfileContext.tsx";
-import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
+import { useProfile } from "../../context/ProfileContext.tsx";
+import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
 import { useEffect } from "react";
 
 const Profile = () => {

@@ -1,7 +1,7 @@
 import { Outlet, Navigate } from "react-router-dom";
-import { useAuth } from "./AuthContext.tsx";
-import { AuthContextData } from "./interfaces/AuthContextData.ts";
-import { ProfileProvider } from "./ProfileContext.tsx";
+import { useAuth } from "../../context/AuthContext.tsx";
+import { AuthContextData } from "../../context/interfaces/AuthContextData.ts";
+import { ProfileProvider } from "../../context/ProfileContext.tsx";
 //import { ProfileProvider } from "./ProfileContext.tsx";
 
 const PrivateRoutes = () => {

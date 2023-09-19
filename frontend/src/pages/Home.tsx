@@ -1,5 +1,5 @@
-import { useProfile } from "../../utils/ProfileContext.tsx";
-import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
+import { useProfile } from "../../context/ProfileContext.tsx";
+import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
 import { useEffect } from "react";
 
 const Home = () => {

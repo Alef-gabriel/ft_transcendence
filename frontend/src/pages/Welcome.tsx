@@ -4,8 +4,8 @@
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { ChangeEvent, FormEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
-import { useProfile } from "../../utils/ProfileContext.tsx";
-import { ProfileContextData } from "../../utils/interfaces/ProfileContextData.ts";
+import { useProfile } from "../../context/ProfileContext.tsx";
+import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
 
 //TODO: Trocar o avatar por uma imagem
 //Fazer o componente dinâmica

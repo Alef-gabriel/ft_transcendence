@@ -3,7 +3,7 @@ import { AuthContextData } from "./interfaces/AuthContextData.ts";
 import axios from "axios";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { FortyTwoUserDto } from "../../backend/src/user/models/forty-two-user.dto.ts";
-import useThrowAsyncError from "./hooks/useThrowAsyncError.ts";
+import useThrowAsyncError from "../utils/hooks/useThrowAsyncError.ts";
 
 const AuthContext = createContext({});
 

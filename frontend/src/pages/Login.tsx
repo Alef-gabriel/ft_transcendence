@@ -1,7 +1,7 @@
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
-import { useAuth } from "../../utils/AuthContext.tsx";
+import { AuthContextData } from "../../context/interfaces/AuthContextData.ts";
+import { useAuth } from "../../context/AuthContext.tsx";
 
 
 //TODO: Receber a rota de login por configuração

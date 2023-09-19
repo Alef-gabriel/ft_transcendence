@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../utils/AuthContext.tsx";
-import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
+import { useAuth } from "../../context/AuthContext.tsx";
+import { AuthContextData } from "../../context/interfaces/AuthContextData.ts";
 
 const Header = () => {
   const { user, logoutUser } = useAuth() as AuthContextData;

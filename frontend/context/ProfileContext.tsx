@@ -1,6 +1,6 @@
 import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
 import { ProfileContextData } from "./interfaces/ProfileContextData";
-import useThrowAsyncError from "./hooks/useThrowAsyncError";
+import useThrowAsyncError from "../utils/hooks/useThrowAsyncError";
 import { ProfileDTO } from "../../backend/src/profile/models/profile.dto";
 import axios, { isAxiosError } from "axios";
 import AuthContext from "./AuthContext";

@@ -1,6 +1,6 @@
 import { FormEvent, MutableRefObject, useRef, useState } from "react";
-import { useAuth } from "../../utils/AuthContext.tsx";
-import { AuthContextData } from "../../utils/interfaces/AuthContextData.ts";
+import { useAuth } from "../../context/AuthContext.tsx";
+import { AuthContextData } from "../../context/interfaces/AuthContextData.ts";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
 
