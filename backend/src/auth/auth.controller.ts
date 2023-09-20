@@ -82,43 +82,15 @@ export class AuthController {
     return { message: 'Logout successful' };
   }
 
-  @Get('2fa/qr-code')
-  async qrCode2FA(@Req() { user }: { user: FortyTwoUserDto }): Promise<any> {
-    const otpAuthUrl: string = await this.authService.generate2FASecret(
-      user.id,
-      user.email,
-    );
-    return this.authService.qrCodeToDataURL(otpAuthUrl);
-  }
-
-  @Post('2fa/turn-on')
-  async turnOn2FA(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() otp: OneTimePasswordDto,
-  ): Promise<any> {
-    await this.authService.enable2FA(req.user as FortyTwoUserDto, otp);
-    await this.authService.login2FAUser(req, res);
-  }
-
-  @Post('2fa/turn-off')
-  @HttpCode(HttpStatus.CREATED)
-  async turnOff2FA(
+  @Get('session')
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async session(
     @Req() { user }: { user: FortyTwoUserDto },
-  ): Promise<ResponseMessage> {
-    await this.authService.disable2FA(user);
-    return { message: 'Two-factor authentication disabled' };
-  }
-
-  @DisableTwoFactorAuthenticationBlock()
-  @Post('2fa/validate')
-  async validate2FA(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() otp: OneTimePasswordDto,
-  ): Promise<any> {
-    await this.authService.validateOTP(req.user as FortyTwoUserDto, otp);
-    await this.authService.login2FAUser(req, res);
+    @Session() session: Record<string, any>,
+  ): Promise<FortyTwoUserDto> {
+    this.logger.debug(`### user session: ${JSON.stringify(session)}`);
+    return plainToClass(FortyTwoUserDto, user);
   }
 
   @DisableTwoFactorAuthenticationBlock()
@@ -133,15 +105,45 @@ export class AuthController {
     return plainToClass(FortyTwoUserDto, user);
   }
 
-  @Get('session')
-  @HttpCode(HttpStatus.OK)
-  @UseInterceptors(ClassSerializerInterceptor)
-  async session(
+  //Return 201, ResponseMessageDto on express-session callback
+  @Post('2fa/turn-on')
+  async turnOn2FA(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() otp: OneTimePasswordDto,
+  ): Promise<any> {
+    await this.authService.enable2FA(req.user as FortyTwoUserDto, otp);
+    await this.authService.login2FAUser(req, res);
+  }
+
+  @Post('2fa/turn-off')
+  @HttpCode(HttpStatus.CREATED)
+  async turnOff2FA(
     @Req() { user }: { user: FortyTwoUserDto },
-    @Session() session: Record<string, any>,
-  ): Promise<FortyTwoUserDto> {
-    this.logger.debug(`### user session: ${JSON.stringify(session)}`);
-    return plainToClass(FortyTwoUserDto, user);
+  ): Promise<ResponseMessageDto> {
+    await this.authService.disable2FA(user);
+    return { message: 'Two-factor authentication disabled' };
+  }
+
+  //Return 201, ResponseMessageDto on express-session callback
+  @DisableTwoFactorAuthenticationBlock()
+  @Post('2fa/validate')
+  async validate2FA(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() otp: OneTimePasswordDto,
+  ): Promise<any> {
+    await this.authService.validateOTP(req.user as FortyTwoUserDto, otp);
+    await this.authService.login2FAUser(req, res);
+  }
+
+  @Get('2fa/qr-code')
+  async qrCode2FA(@Req() { user }: { user: FortyTwoUserDto }): Promise<string> {
+    const otpAuthUrl: string = await this.authService.generate2FASecret(
+      user.id,
+      user.email,
+    );
+    return this.authService.qrCodeToDataURL(otpAuthUrl);
   }
 
   // Debug route to check if user is authenticated

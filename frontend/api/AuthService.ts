@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import { AxiosResponse } from "axios";
 import { FortyTwoUserDto } from "../../backend/src/user/models/forty-two-user.dto.ts";
+import { ResponseMessageDto } from "../../backend/src/auth/models/response-message.dto.ts";
+import { OneTimePasswordDto } from "../../backend/src/auth/models/one-time-password.dto.ts";
 
 class AuthService {
   private axiosInstance: AxiosInstance;
@@ -12,31 +14,32 @@ class AuthService {
     });
   }
 
-  public async validateUserSession(): Promise<AxiosResponse<FortyTwoUserDto>> {
-    return this.axiosInstance.get('/session');
+  public async logoutUser(): Promise<AxiosResponse<ResponseMessageDto>> {
+    return this.axiosInstance.get('/logout');
   }
 
-  public async logoutUser() {
-    return this.axiosInstance.get('/logout');
+  public async validateUserSession(): Promise<AxiosResponse<FortyTwoUserDto>> {
+    return this.axiosInstance.get('/session');
   }
 
   public async validate2FASession(): Promise<AxiosResponse<FortyTwoUserDto>> {
     return this.axiosInstance.get('/2fa/session');
   }
 
-  public async enable2FA(code: string) {
-    return this.axiosInstance.post('/2fa/turn-on', { code });
+
+  public async enable2FA(code: string): Promise<AxiosResponse<ResponseMessageDto>>  {
+    return this.axiosInstance.post('/2fa/turn-on', { code } as OneTimePasswordDto);
   }
 
-  public async disable2FA() {
+  public async disable2FA(): Promise<AxiosResponse<ResponseMessageDto>> {
     return this.axiosInstance.post('/2fa/turn-off', {});
   }
 
-  public async validateOTP(code: string) {
+  public async validateOTP(code: string): Promise<AxiosResponse<ResponseMessageDto>> {
     return this.axiosInstance.post('/2fa/validate', { code });
   }
 
-  public async get2FAQRCode() {
+  public async get2FAQRCode(): Promise<string> {
     return this.axiosInstance.get('/2fa/qr-code');
   }
 }
