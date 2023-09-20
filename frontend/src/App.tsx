@@ -2,7 +2,7 @@ import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header.js";
 import Home from "./pages/Home.js";
-import Profile from "./pages/Profile.js";
+import ProfileSettings from "./pages/ProfileSettings.tsx";
 import Login from "./pages/Login.js";
 import Register2FA from "./pages/Register2FA.tsx";
 import PrivateRoutes from "./components/PrivateRoutes.tsx";
@@ -10,7 +10,7 @@ import { AuthProvider } from "../context/AuthContext.tsx";
 import ValidateOTP from "./pages/ValidateOTP.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ErrorBoundary from "./components/ErrorBoundary.tsx";
-import Welcome from "./pages/Welcome.tsx";
+import ProfileCustomization from "./pages/Customization.tsx";
 import { ProfileProvider } from "../context/ProfileContext.tsx";
 
 function App() {
@@ -31,8 +31,9 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route element={<PrivateRoutes />}>
                 <Route path="/" element={<Home />} />
-                <Route path="/welcome" element={<Welcome />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/welcome" element={<ProfileCustomization title={"Welcome to Pong!!"}/>} />
+                <Route path="/customization" element={<ProfileCustomization title={"Update your profile"}/>} />
+                <Route path="/profile" element={<ProfileSettings />} />
                 <Route path="/register-2fa" element={<Register2FA />} />
                 <Route path="/validate-otp" element={<ValidateOTP />} />
               </Route>

@@ -4,7 +4,7 @@ import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useProfile } from "../../context/ProfileContext.tsx";
 import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
 
-const Profile = () => {
+const ProfileSettings = () => {
   const navigate: NavigateFunction = useNavigate();
   const { user, disable2FA } = useAuth() as AuthContextData;
   const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
@@ -23,10 +23,8 @@ const Profile = () => {
       </div>
 
       <br></br>
-      <button className="btn">Change Avatar (Not Impl)</button>
+      <button className="btn" onClick={() => navigate("/customization")}>Change your profile</button>
 
-      <br></br>
-      <button className="btn">Change Nickname (Not Impl)</button>
 
       <br></br>
       <button className="btn" onClick={ user?.otpEnabled ? disable2FA : () => navigate("/register-2fa")} >
@@ -41,4 +39,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileSettings;

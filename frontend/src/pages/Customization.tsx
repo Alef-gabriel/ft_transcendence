@@ -6,16 +6,11 @@ import { ChangeEvent, FormEvent, MutableRefObject, useEffect, useRef, useState }
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
 import { useProfile } from "../../context/ProfileContext.tsx";
 import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
+import { ProfileDTO } from "../../../backend/src/profile/models/profile.dto.ts";
 
-//TODO: Trocar o avatar por uma imagem
-//Fazer o componente dinâmica
-//Criar um estado para saber se o usuário já tem um profile (enviou o nickname)
-//  Se não enviou, renderizar o formulário do nickname
-//  Se já enviou, renderizar o formulário do avatar
-
-const Welcome = () => {
+const Customization = ({title} : {title: string}) => {
   const welcomeForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
-  const { profile, createProfile, uploadAvatarImage } = useProfile() as ProfileContextData;
+  const { profile, createProfile, uploadAvatarImage, updateProfile } = useProfile() as ProfileContextData;
   const navigate: NavigateFunction = useNavigate();
   const throwAsyncError = useThrowAsyncError();
   const [invalidProfile, setInvalidProfile] = useState<boolean>(false);
@@ -25,10 +20,11 @@ const Welcome = () => {
 
 
   useEffect(() => {
-    if (profile && continueToHome) {
+    if (continueToHome) {
       navigate("/");
       return;
     }
+
   }, [continueToHome, navigate, profile]);
 
   const handleNicknameSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -46,7 +42,9 @@ const Welcome = () => {
         return;
       }
 
-      await createProfile(nickname);
+      profile
+        ? await updateProfile({ nickname } as Partial<ProfileDTO>)
+        : await createProfile(nickname);
 
       setNicknameSaved(true);
     } catch (error) {
@@ -77,10 +75,10 @@ const Welcome = () => {
     }
   }
 
-  return !nicknameSaved && !profile ? (
+  return !nicknameSaved ? (
         <>
           <div className="container">
-            <h1 className="welcome-title">Welcome to Pong!</h1>
+            <h1 className="welcome-title">{title}</h1>
           </div>
 
             <div className="welcome-form-wrapper">
@@ -92,7 +90,7 @@ const Welcome = () => {
                 </div>
 
                 <div className="form-field-btn-wrapper">
-                  <input type="submit" value="Create Profile" className="btn-small" />
+                  <input type="submit" value="Submit" className="btn-small" />
                 </div>
 
               </form>
@@ -131,4 +129,4 @@ const Welcome = () => {
        );
 };
 
-export default Welcome;
+export default Customization;
