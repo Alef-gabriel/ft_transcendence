@@ -1,20 +1,10 @@
 import { useProfile } from "../../context/ProfileContext.tsx";
 import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
-import { useEffect } from "react";
 
 const Home = () => {
-  const { profile, avatarImageUrl, updateProfileContext} = useProfile() as ProfileContextData;
-
-  useEffect(() => {
-    if (!avatarImageUrl) {
-      console.log(`### Avatar Image URL undefined`);
-      updateProfileContext();
-      return;
-    }
-  }, []);
+  const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
 
   return (
-
     <div className="container">
       <h1>Player Dashboard</h1>
 

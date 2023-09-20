@@ -29,15 +29,15 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       setLoading(false);
       return;
     }
-    updateProfileContext().then(() => setLoading(false));
+    refreshProfileContext().then(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     getAvatarImage(profile?.avatarId);
-  }, [profile]);
+  }, [profile?.avatarId]);
 
-  const updateProfileContext = async (): Promise<void> => {
-    if (location.pathname === '/validate-otp') {
+  const refreshProfileContext = async (): Promise<void> => {
+    if (location.pathname === "/validate-otp") {
       return;
     }
 
@@ -49,6 +49,15 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       if (isAxiosError(error) && error.response?.status !== 404) {
         throwAsyncError(error);
       }
+    }
+  };
+
+  const updateProfile = async (PartialProfile: Partial<ProfileDTO>): Promise<void> => {
+    try {
+      const response: AxiosResponse<ProfileDTO> = await profileService.updateProfile(PartialProfile);
+      setProfile(response.data);
+    } catch (error) {
+      throwAsyncError(error);
     }
   };
 
@@ -64,13 +73,13 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
   const uploadAvatarImage = async (formData: FormData): Promise<void> => {
     try {
       await profileService.uploadAvatarImage(formData);
-      await updateProfileContext();
+      await refreshProfileContext();
     } catch (error) {
       throwAsyncError(error);
     }
   };
 
-  const getAvatarImage = async (avatarId :number | undefined): Promise<void> => {
+  const getAvatarImage = async (avatarId: number | undefined): Promise<void> => {
     if (!avatarId) {
       return;
     }
@@ -78,14 +87,27 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     try {
       const response: AxiosResponse<Blob> = await profileService.getAvatarImage(avatarId);
 
-      const blob: Blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const blob: Blob = new Blob([response.data], { type: response.headers["content-type"] });
       setAvatarImageUrl(URL.createObjectURL(blob));
-    } catch(error) {
+    } catch (error) {
       throwAsyncError(error);
     }
-  }
+  };
 
-  const contextData: ProfileContextData = { profile, avatarImageUrl, updateProfileContext, createProfile, uploadAvatarImage };
+  const updateAvatarImage = async (formData: FormData): Promise<void> => {}
+
+  const deleteAccount = async (): Promise<void> => {}
+
+  const contextData: ProfileContextData = {
+    profile,
+    avatarImageUrl,
+    refreshProfileContext,
+    createProfile,
+    updateProfile,
+    uploadAvatarImage,
+    updateAvatarImage,
+    deleteAccount,
+  };
 
   return (
     <ProfileContext.Provider value={contextData}>

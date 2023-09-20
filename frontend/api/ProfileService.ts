@@ -33,6 +33,10 @@ class ProfileService {
       }
     });
   }
+
+  public async updateProfile(profile: Partial<ProfileDTO>): Promise<AxiosResponse<ProfileDTO>> {
+    return this.axiosInstance.put('', profile);
+  }
 }
 
 const profileService: ProfileService = new ProfileService('http://localhost:3000/api/profile');
