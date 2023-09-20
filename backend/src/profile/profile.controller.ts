@@ -105,7 +105,7 @@ export class ProfileController {
   async getAvatarById(
     @Res({ passthrough: true }) response: Response,
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<any> {
+  ): Promise<StreamableFile> {
     const avatar: AvatarEntity = await this.avatarService.getById(id);
 
     const stream: Readable = Readable.from(avatar.data);

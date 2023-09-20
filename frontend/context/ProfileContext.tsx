@@ -2,10 +2,11 @@ import { createContext, FC, ReactNode, useContext, useEffect, useState } from "r
 import { ProfileContextData } from "./interfaces/ProfileContextData";
 import useThrowAsyncError from "../utils/hooks/useThrowAsyncError";
 import { ProfileDTO } from "../../backend/src/profile/models/profile.dto";
-import axios, { isAxiosError } from "axios";
 import AuthContext from "./AuthContext";
 import { useLocation } from "react-router-dom";
 import { AuthContextData } from "./interfaces/AuthContextData.ts";
+import profileService from "../api/ProfileService.ts";
+import { AxiosResponse, isAxiosError } from "axios";
 
 const ProfileContext = createContext({});
 
@@ -44,8 +45,8 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
 
     try {
-      const response = await axios.get("http://localhost:3000/api/profile",
-        { withCredentials: true });
+      const response: AxiosResponse<ProfileDTO> = await profileService.getProfile();
+
       console.log(`### Profile context updated: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
       setLoading(false);
@@ -61,8 +62,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
 
   const createProfile = async (nickname: string): Promise<void> => {
     try {
-      const response = await axios.post("http://localhost:3000/api/profile/create",
-        { nickname }, { withCredentials: true });
+      const response: AxiosResponse<ProfileDTO> = await profileService.createProfile(nickname);
 
       console.log(`### Profile created: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
@@ -74,12 +74,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
 
   const uploadAvatarImage = async (formData: FormData): Promise<void> => {
     try {
-      const response = await axios.post("http://localhost:3000/api/profile/avatar", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        withCredentials: true
-      });
+      const response: AxiosResponse<ProfileDTO> = await profileService.uploadAvatarImage(formData);
 
       console.log(`### Avatar uploaded: ${JSON.stringify(response.data)}`);
       await updateProfileContext();
@@ -96,13 +91,9 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
 
     try {
-      const response = await axios
-        .get(`http://localhost:3000/api/profile/avatar/${avatarId}`, {
-          responseType: 'blob',
-          withCredentials: true,
-        });
+      const response: AxiosResponse<Blob> = await profileService.getAvatarImage(avatarId);
 
-      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const blob: Blob = new Blob([response.data], { type: response.headers['content-type'] });
       setAvatarImageUrl(URL.createObjectURL(blob));
     } catch(error) {
       console.error('Error fetching image:', error);

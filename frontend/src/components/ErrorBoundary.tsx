@@ -23,10 +23,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    this.setState({ hasError: true, error });
-
     if (isAxiosError(error)) {
       this.setState({ hasError: true, error, errorCode: error.response?.status });
+    } else {
+      this.setState({ hasError: true, error });
     }
 
     console.error(error, errorInfo);

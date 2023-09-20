@@ -1,4 +1,6 @@
 import axios, { AxiosInstance } from "axios";
+import { AxiosResponse } from "axios";
+import { FortyTwoUserDto } from "../../backend/src/user/models/forty-two-user.dto.ts";
 
 class AuthService {
   private axiosInstance: AxiosInstance;
@@ -10,7 +12,7 @@ class AuthService {
     });
   }
 
-  public async validateUserSession() {
+  public async validateUserSession(): Promise<AxiosResponse<FortyTwoUserDto>> {
     return this.axiosInstance.get('/session');
   }
 
@@ -18,7 +20,7 @@ class AuthService {
     return this.axiosInstance.get('/logout');
   }
 
-  public async validate2FASession() {
+  public async validate2FASession(): Promise<AxiosResponse<FortyTwoUserDto>> {
     return this.axiosInstance.get('/2fa/session');
   }
 
