@@ -29,7 +29,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       setLoading(false);
       return;
     }
-    updateProfileContext();
+    updateProfileContext().then(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -38,19 +38,16 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
 
   const updateProfileContext = async (): Promise<void> => {
     if (location.pathname === '/validate-otp') {
-      setLoading(false);
       return;
     }
 
     try {
       const response: AxiosResponse<ProfileDTO> = await profileService.getProfile();
       setProfile(response.data);
-      setLoading(false);
     } catch (error) {
+
       if (isAxiosError(error) && error.response?.status !== 404) {
         throwAsyncError(error);
-      } else {
-        setLoading(false);
       }
     }
   };
