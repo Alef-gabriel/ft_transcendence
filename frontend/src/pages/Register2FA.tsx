@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext.tsx";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import useThrowAsyncError from "../../utils/hooks/useThrowAsyncError.ts";
 import authService from "../../api/AuthService.ts";
+import { AxiosResponse } from "axios";
 
 const Register2FA = () => {
   const registerForm: MutableRefObject<HTMLFormElement | null> = useRef<HTMLFormElement | null>(null);
@@ -13,9 +14,9 @@ const Register2FA = () => {
   const [wrongOtp, setWrongOtp] = useState<boolean>(false);
   const throwAsyncError = useThrowAsyncError();
 
-  const handleRegisterQRCode = () => {
+  const handleRegisterQRCode = (): void => {
       authService.get2FAQRCode()
-      .then((response) => setQRCode(response.data))
+      .then((response: AxiosResponse<string>) => setQRCode(response.data))
       .catch((error) => throwAsyncError(error));
   };
 

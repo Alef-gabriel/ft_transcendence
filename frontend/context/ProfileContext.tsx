@@ -16,7 +16,6 @@ interface ProfileProvideProps {
   children: ReactNode;
 }
 
-//TODO: Bug Avatar não aparece na primeira vez que o usuário faz login
 export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
   const { user } = useContext(AuthContext) as AuthContextData;
   const [loading, setLoading] = useState<boolean>(true);
@@ -39,19 +38,15 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
 
   const updateProfileContext = async (): Promise<void> => {
     if (location.pathname === '/validate-otp') {
-      console.log(`### Profile context update skipped for validate-otp page`);
       setLoading(false);
       return;
     }
 
     try {
       const response: AxiosResponse<ProfileDTO> = await profileService.getProfile();
-
-      console.log(`### Profile context updated: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
       setLoading(false);
     } catch (error) {
-      console.log(`### Profile context update failed: ${error}`);
       if (isAxiosError(error) && error.response?.status !== 404) {
         throwAsyncError(error);
       } else {
@@ -63,30 +58,23 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
   const createProfile = async (nickname: string): Promise<void> => {
     try {
       const response: AxiosResponse<ProfileDTO> = await profileService.createProfile(nickname);
-
-      console.log(`### Profile created: ${JSON.stringify(response.data)}`);
       setProfile(response.data);
     } catch (error) {
-      console.log(`### Profile creation failed: ${error}`);
       throwAsyncError(error);
     }
   };
 
   const uploadAvatarImage = async (formData: FormData): Promise<void> => {
     try {
-      const response: AxiosResponse<ProfileDTO> = await profileService.uploadAvatarImage(formData);
-
-      console.log(`### Avatar uploaded: ${JSON.stringify(response.data)}`);
+      await profileService.uploadAvatarImage(formData);
       await updateProfileContext();
     } catch (error) {
-      console.log(`### Avatar upload failed: ${error}`);
       throwAsyncError(error);
     }
   };
 
   const getAvatarImage = async (avatarId :number | undefined): Promise<void> => {
     if (!avatarId) {
-      console.log(`### AvatarId is undefined, skipping avatar image fetch`);
       return;
     }
 
@@ -96,7 +84,6 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       const blob: Blob = new Blob([response.data], { type: response.headers['content-type'] });
       setAvatarImageUrl(URL.createObjectURL(blob));
     } catch(error) {
-      console.error('Error fetching image:', error);
       throwAsyncError(error);
     }
   }

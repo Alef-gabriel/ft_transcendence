@@ -39,7 +39,7 @@ class AuthService {
     return this.axiosInstance.post('/2fa/validate', { code });
   }
 
-  public async get2FAQRCode(): Promise<string> {
+  public async get2FAQRCode(): Promise<AxiosResponse<string>> {
     return this.axiosInstance.get('/2fa/qr-code');
   }
 }
