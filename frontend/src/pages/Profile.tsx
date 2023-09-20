@@ -3,20 +3,11 @@ import { useAuth } from "../../context/AuthContext.tsx";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useProfile } from "../../context/ProfileContext.tsx";
 import { ProfileContextData } from "../../context/interfaces/ProfileContextData.ts";
-import { useEffect } from "react";
 
 const Profile = () => {
   const navigate: NavigateFunction = useNavigate();
   const { user, disable2FA } = useAuth() as AuthContextData;
-  const { profile, avatarImageUrl, updateProfileContext} = useProfile() as ProfileContextData;
-
-  useEffect(() => {
-    if (!avatarImageUrl) {
-      console.log(`### Avatar Image URL undefined`);
-      updateProfileContext();
-      return;
-    }
-  }, []);
+  const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
 
   return (
     <div className="container">

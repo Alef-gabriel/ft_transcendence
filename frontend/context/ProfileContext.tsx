@@ -30,7 +30,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
       return;
     }
     refreshProfileContext().then(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     getAvatarImage(profile?.avatarId);
@@ -94,7 +94,7 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
   };
 
-  const updateAvatarImage = async (formData: FormData): Promise<void> => {}
+  const updateAvatarImage = async (/*formData: FormData*/): Promise<void> => {}
 
   const deleteAccount = async (): Promise<void> => {}
 
