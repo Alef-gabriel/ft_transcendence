@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, QueryRunner, Repository } from 'typeorm';
 import { AvatarEntity } from '../db/entities';
 import { AvatarDTO } from './models/avatar.dto';
 import { plainToClass } from 'class-transformer';
@@ -14,19 +14,9 @@ export class AvatarService {
     private readonly avatarRepository: Repository<AvatarEntity>,
   ) {}
 
-  async upload(dataBuffer: Buffer, filename: string): Promise<AvatarDTO> {
-    const newAvatar: AvatarEntity = this.avatarRepository.create({
-      filename,
-      data: dataBuffer,
-    });
-
-    await this.avatarRepository.save(newAvatar);
-
-    this.logger.verbose(`Avatar [${newAvatar.id}] uploaded`);
-    return plainToClass(AvatarDTO, newAvatar);
-  }
-
   async getById(id: number): Promise<AvatarEntity> {
+    this.logger.verbose(`Getting avatar [${id}]`);
+
     const avatar: AvatarEntity | null = await this.avatarRepository.findOneBy({
       id,
     });
@@ -34,5 +24,43 @@ export class AvatarService {
       throw new NotFoundException();
     }
     return avatar;
+  }
+
+  async uploadWithQueryRunner(
+    dataBuffer: Buffer,
+    filename: string,
+    queryRunner: QueryRunner,
+  ): Promise<AvatarDTO> {
+    const newAvatar: AvatarEntity = queryRunner.manager.create(AvatarEntity, {
+      filename,
+      data: dataBuffer,
+    });
+
+    const savedAvatar: AvatarEntity = await queryRunner.manager.save(
+      AvatarEntity,
+      newAvatar,
+    );
+
+    this.logger.verbose(`Avatar [${newAvatar.id}] uploaded`);
+
+    return plainToClass(AvatarDTO, savedAvatar);
+  }
+
+  async deleteWithQueryRunner(
+    fileId: number,
+    queryRunner: QueryRunner,
+  ): Promise<void> {
+    const deleteResponse: DeleteResult = await queryRunner.manager.delete(
+      AvatarEntity,
+      {
+        id: fileId,
+      },
+    );
+
+    if (!deleteResponse.affected) {
+      throw new NotFoundException();
+    }
+
+    this.logger.verbose(`Avatar [${fileId}] deleted`);
   }
 }

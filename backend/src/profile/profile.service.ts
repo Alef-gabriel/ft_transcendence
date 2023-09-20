@@ -8,8 +8,10 @@ import { UserService } from '../user/user.service';
 import { ProfileEntity, UserEntity } from '../db/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  DataSource,
   DeleteResult,
   QueryFailedError,
+  QueryRunner,
   Repository,
   UpdateResult,
 } from 'typeorm';
@@ -30,27 +32,30 @@ export class ProfileService {
     private readonly avatarService: AvatarService,
     @InjectRepository(ProfileEntity)
     private readonly profileRepository: Repository<ProfileEntity>,
+    private dataSource: DataSource,
   ) {}
 
-  async findByUserId(id: number): Promise<ProfileDTO> {
+  async findByUserId(userId: number): Promise<ProfileDTO> {
     const profileEntity: ProfileEntity | null =
       await this.profileRepository.findOneBy({
-        userEntity: { id },
+        userEntity: { id: userId },
       });
 
     if (!profileEntity) {
-      throw new NotFoundException(`User [${id}] not found`);
+      throw new NotFoundException(`User [${userId}] not found`);
     }
 
-    this.logger.log(`Profile found for user [${id}]`);
+    this.logger.log(`Profile found for user [${userId}]`);
     return plainToClass(ProfileDTO, profileEntity);
   }
 
-  async create(id: number, nickname: string): Promise<ProfileDTO> {
-    const userEntity: UserEntity | null = await this.userService.findById(id);
+  async create(userId: number, nickname: string): Promise<ProfileDTO> {
+    const userEntity: UserEntity | null = await this.userService.findById(
+      userId,
+    );
 
     if (!userEntity) {
-      throw new NotFoundException(`User [${id}] not found`);
+      throw new NotFoundException(`User [${userId}] not found`);
     }
 
     const profileEntity: ProfileEntity = new ProfileEntity();
@@ -62,33 +67,33 @@ export class ProfileService {
       savedEntity = await this.profileRepository.save(profileEntity);
     } catch (Exception) {
       if (Exception instanceof QueryFailedError) {
-        this.logger.error(`Profile already exists for user [${id}]`);
-        throw new BadRequestException(`user [${id}] already has a profile`);
+        this.logger.error(`Profile already exists for user [${userId}]`);
+        throw new BadRequestException(`user [${userId}] already has a profile`);
       }
       throw Exception;
     }
 
-    this.logger.log(`Profile created for user [${id}]`);
+    this.logger.log(`Profile created for user [${userId}]`);
     return plainToClass(ProfileDTO, savedEntity);
   }
 
   async update(
-    id: number,
+    userId: number,
     profile: Partial<Profile>,
   ): Promise<ProfileUpdatedResponseDto> {
     const updateResult: UpdateResult = await this.profileRepository.update(
-      { userEntity: { id } },
+      { userEntity: { id: userId } },
       profile,
     );
 
     if (!updateResult.affected) {
       this.logger.error(
-        `Profile not found for user [${id}], nothing to update`,
+        `Profile not found for user [${userId}], nothing to update`,
       );
-      throw new NotFoundException(`User [${id}] not found`);
+      throw new NotFoundException(`User [${userId}] not found`);
     }
 
-    this.logger.log(`Profile updated for user [${id}]`);
+    this.logger.log(`Profile updated for user [${userId}]`);
     return {
       updated: updateResult.affected > 0,
       affected: updateResult.affected,
@@ -110,25 +115,52 @@ export class ProfileService {
     };
   }
 
-  async addAvatar(
+  async uploadAvatar(
     userId: number,
     imageBuffer: Buffer,
     filename: string,
   ): Promise<AvatarDTO> {
-    this.logger.verbose(`Adding avatar for user [${userId}]`);
+    this.logger.verbose(`Updating avatar for user [${userId}]`);
 
-    const avatar: AvatarDTO = await this.avatarService.upload(
-      imageBuffer,
-      filename,
-    );
+    let avatarDTO: AvatarDTO | null = null;
 
-    this.logger.verbose(`Adding avatarId for user profile [${userId}]`);
-    await this.profileRepository.update(
-      { userEntity: { id: userId } },
-      { avatarId: avatar.id },
-    );
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    this.logger.log(`Avatar added for user [${userId}]`);
-    return avatar;
+    try {
+      const profileEntity: ProfileEntity | null =
+        await queryRunner.manager.findOneBy(ProfileEntity, {
+          userEntity: { id: userId },
+        });
+
+      avatarDTO = await this.avatarService.uploadWithQueryRunner(
+        imageBuffer,
+        filename,
+        queryRunner,
+      );
+
+      await queryRunner.manager.update(
+        ProfileEntity,
+        { userEntity: { id: userId } },
+        { avatarId: avatarDTO.id },
+      );
+
+      if (profileEntity?.avatarId) {
+        await this.avatarService.deleteWithQueryRunner(
+          profileEntity.avatarId,
+          queryRunner,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+
+    return avatarDTO;
   }
 }

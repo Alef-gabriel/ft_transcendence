@@ -94,7 +94,7 @@ export class ProfileController {
     )
     file: Express.Multer.File,
   ): Promise<AvatarDTO> {
-    return this.profileService.addAvatar(
+    return this.profileService.uploadAvatar(
       user.id,
       file.buffer,
       file.originalname,

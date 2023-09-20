@@ -105,7 +105,6 @@ export class AuthController {
     return plainToClass(FortyTwoUserDto, user);
   }
 
-  //Return 201, ResponseMessageDto on express-session callback
   @Post('2fa/turn-on')
   async turnOn2FA(
     @Req() req: Request,
@@ -113,7 +112,7 @@ export class AuthController {
     @Body() otp: OneTimePasswordDto,
   ): Promise<any> {
     await this.authService.enable2FA(req.user as FortyTwoUserDto, otp);
-    await this.authService.login2FAUser(req, res);
+    await this.authService.login2FAUser(req, res); //Express-Session Callback
   }
 
   @Post('2fa/turn-off')
@@ -125,7 +124,6 @@ export class AuthController {
     return { message: 'Two-factor authentication disabled' };
   }
 
-  //Return 201, ResponseMessageDto on express-session callback
   @DisableTwoFactorAuthenticationBlock()
   @Post('2fa/validate')
   async validate2FA(
@@ -134,7 +132,7 @@ export class AuthController {
     @Body() otp: OneTimePasswordDto,
   ): Promise<any> {
     await this.authService.validateOTP(req.user as FortyTwoUserDto, otp);
-    await this.authService.login2FAUser(req, res);
+    await this.authService.login2FAUser(req, res); //Express-Session Callback
   }
 
   @Get('2fa/qr-code')
