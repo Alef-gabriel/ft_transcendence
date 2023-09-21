@@ -7,6 +7,5 @@ export interface ProfileContextData {
   createProfile: (nickname: string) => Promise<void>;
   updateProfile: (profile: Partial<ProfileDTO>) => Promise<void>;
   uploadAvatarImage: (formData: FormData) => Promise<void>;
-  updateAvatarImage: (formData: FormData) => Promise<void>;
   deleteAccount: () => Promise<void>;
 }

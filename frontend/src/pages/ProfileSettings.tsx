@@ -7,7 +7,14 @@ import { ProfileContextData } from "../../context/interfaces/ProfileContextData.
 const ProfileSettings = () => {
   const navigate: NavigateFunction = useNavigate();
   const { user, disable2FA } = useAuth() as AuthContextData;
-  const { profile, avatarImageUrl} = useProfile() as ProfileContextData;
+  const { profile, avatarImageUrl, deleteAccount} = useProfile() as ProfileContextData;
+
+  const handleDeleteAccount = async (): Promise<void> => {
+    if (window.confirm("Are you sure you want to delete your account?")) {
+      await deleteAccount();
+      navigate("/login");
+    }
+  }
 
   return (
     <div className="container">
@@ -33,7 +40,7 @@ const ProfileSettings = () => {
 
       <br></br>
 
-      <button className="btn">Delete Account (Not Impl)</button>
+      <button className="btn" onClick={handleDeleteAccount}>Delete Account</button>
 
     </div>
   );

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { ProfileDTO } from "../../backend/src/profile/models/profile.dto.ts";
+import { ProfileDeletedResponseDto } from "../../backend/src/profile/models/profile-delete-response.dto.ts";
 
 
 class ProfileService {
@@ -36,6 +37,10 @@ class ProfileService {
 
   public async updateProfile(profile: Partial<ProfileDTO>): Promise<AxiosResponse<ProfileDTO>> {
     return this.axiosInstance.put('', profile);
+  }
+
+  public async deleteAccount(): Promise<AxiosResponse<ProfileDeletedResponseDto>> {
+    return this.axiosInstance.delete('');
   }
 }
 

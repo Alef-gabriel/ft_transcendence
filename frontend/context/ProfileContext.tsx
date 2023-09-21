@@ -94,9 +94,14 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     }
   };
 
-  const updateAvatarImage = async (/*formData: FormData*/): Promise<void> => {}
-
-  const deleteAccount = async (): Promise<void> => {}
+  const deleteAccount = async (): Promise<void> => {
+    try {
+      await profileService.deleteAccount();
+      setProfile(null);
+    } catch (error) {
+      throwAsyncError(error);
+    }
+  }
 
   const contextData: ProfileContextData = {
     profile,
@@ -105,7 +110,6 @@ export const ProfileProvider: FC<ProfileProvideProps> = ({ children }) => {
     createProfile,
     updateProfile,
     uploadAvatarImage,
-    updateAvatarImage,
     deleteAccount,
   };
 
