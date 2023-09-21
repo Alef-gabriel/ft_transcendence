@@ -100,18 +100,43 @@ export class ProfileService {
     };
   }
 
-  async delete(id: number): Promise<ProfileDeletedResponseDto> {
-    const userDeleteResult: DeleteResult = await this.userService.delete(id);
+  async delete(userId: number): Promise<ProfileDeletedResponseDto> {
+    const profileDto: ProfileDTO = await this.findByUserId(userId);
+
+    const userDeleteResult: DeleteResult = await this.userService.delete(
+      userId,
+    );
 
     if (!userDeleteResult.affected) {
-      this.logger.error(`### User [${id}] not found, nothing to delete`);
-      throw new NotFoundException(`User [${id}] not found`);
+      this.logger.error(`### User [${userId}] not found, nothing to delete`);
+      throw new NotFoundException(`User [${userId}] not found`);
     }
 
-    this.logger.log(`### User [${id}] and profile deleted`);
+    this.logger.log(`### User [${userId}] and profile deleted`);
+
+    if (!profileDto.avatarId) {
+      return {
+        deleted: userDeleteResult.affected > 0,
+        affected: userDeleteResult.affected,
+      };
+    }
+
+    const avatarDeleteResult: DeleteResult = await this.avatarService.delete(
+      profileDto.avatarId,
+    );
+
+    if (!avatarDeleteResult.affected) {
+      this.logger.error(
+        `### Avatar [${profileDto.avatarId}] not found, nothing to delete`,
+      );
+      throw new NotFoundException(`Avatar [${profileDto.avatarId}] not found`);
+    }
+
+    this.logger.log(`### User [${userId}] avatar deleted`);
+
     return {
-      deleted: userDeleteResult.affected > 0,
-      affected: userDeleteResult.affected,
+      deleted: userDeleteResult.affected > 0 && avatarDeleteResult.affected > 0,
+      affected: userDeleteResult.affected + avatarDeleteResult.affected,
     };
   }
 

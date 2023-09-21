@@ -15,7 +15,7 @@ export class AvatarService {
   ) {}
 
   async getById(id: number): Promise<AvatarEntity> {
-    this.logger.verbose(`Getting avatar [${id}]`);
+    this.logger.verbose(`### Getting avatar [${id}]`);
 
     const avatar: AvatarEntity | null = await this.avatarRepository.findOneBy({
       id,
@@ -24,6 +24,14 @@ export class AvatarService {
       throw new NotFoundException();
     }
     return avatar;
+  }
+
+  async delete(id: number): Promise<DeleteResult> {
+    this.logger.verbose(`### Deleting avatar [${id}]`);
+
+    return await this.avatarRepository.delete({
+      id,
+    });
   }
 
   async uploadWithQueryRunner(
@@ -41,7 +49,7 @@ export class AvatarService {
       newAvatar,
     );
 
-    this.logger.verbose(`Avatar [${newAvatar.id}] uploaded`);
+    this.logger.verbose(`### Avatar [${newAvatar.id}] uploaded`);
 
     return plainToClass(AvatarDTO, savedAvatar);
   }
@@ -50,17 +58,17 @@ export class AvatarService {
     fileId: number,
     queryRunner: QueryRunner,
   ): Promise<void> {
-    const deleteResponse: DeleteResult = await queryRunner.manager.delete(
+    const deleteResult: DeleteResult = await queryRunner.manager.delete(
       AvatarEntity,
       {
         id: fileId,
       },
     );
 
-    if (!deleteResponse.affected) {
+    if (!deleteResult.affected) {
       throw new NotFoundException();
     }
 
-    this.logger.verbose(`Avatar [${fileId}] deleted`);
+    this.logger.verbose(`### Avatar [${fileId}] deleted`);
   }
 }
