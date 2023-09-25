@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
-import entities from './db/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserAuthenticatedGuard } from './auth';
 import { UserModule } from './user/user.module';
 import { ProfileModule } from './profile/profile.module';
 import AvatarModule from './avatar/avatar.module';
+import { dataSourceOptions } from './db/data-source-cli';
 
 @Module({
   imports: [
@@ -18,21 +18,7 @@ import AvatarModule from './avatar/avatar.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST') || 'localhost',
-        port: configService.get<number>('DB_PORT') || 5432,
-        username: configService.get<string>('DB_USERNAME') || 'root',
-        password: configService.get<string>('DB_PASSWORD') || 'root',
-        database: configService.get<string>('DB_NAME') || 'transcendence',
-        entities: entities,
-        synchronize: true,
-        autoLoadEntities: true,
-      }),
-      inject: [ConfigService],
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     PassportModule.register({ session: true }),
   ],
   controllers: [],
